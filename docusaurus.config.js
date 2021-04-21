@@ -1,10 +1,8 @@
-const BASE_URL = process.env.NODE_ENV === 'development' ? '/' : '/docs/';
-
 module.exports = {
   title: 'crust{.js}',
   tagline: 'Crust does JavaScript',
-  url: 'https://polkadot.js.org',
-  baseUrl: BASE_URL,
+  url: 'https://crust.network',
+  baseUrl: '/',
   onBrokenLinks: 'throw',
   favicon: 'img/favicon.ico',
   organizationName: 'crustio',
@@ -25,6 +23,7 @@ module.exports = {
           position: 'right',
         },
         {
+          href: 'https://github.com/crustio/docs',
           label: 'GitHub',
           position: 'right',
         },
