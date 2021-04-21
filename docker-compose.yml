@@ -1,0 +1,7 @@
+version: "3"
+
+services:
+  crust-docs:
+    image: crustio/crust-docs
+    ports:
+       - 8080:8080
