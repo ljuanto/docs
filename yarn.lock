@@ -6165,6 +6165,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"crust-js-docs@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "crust-js-docs@workspace:."
+  dependencies:
+    "@docusaurus/core": 2.0.0-alpha.70
+    "@docusaurus/preset-classic": 2.0.0-alpha.70
+    "@mdx-js/react": ^1.6.22
+    "@polkadot/dev": ^0.62.7
+    "@polkadot/typegen": ^4.5.1
+    clsx: ^1.1.1
+    react: ^17.0.1
+    react-dom: ^17.0.1
+  languageName: unknown
+  linkType: soft
+
 "crypto-browserify@npm:^3.11.0":
   version: 3.12.0
   resolution: "crypto-browserify@npm:3.12.0"
@@ -13710,21 +13725,6 @@ fsevents@^1.2.7:
   checksum: 39a484182f8fc08cb1420d4a5ccf16457c6498a4546bfbad9e00df7238ba7d98796e9aa6f82a4e803a627860409ffed491a55c5a1384e09bed60cefeb618586d
   languageName: node
   linkType: hard
-
-"polkadot-js@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "polkadot-js@workspace:."
-  dependencies:
-    "@docusaurus/core": 2.0.0-alpha.70
-    "@docusaurus/preset-classic": 2.0.0-alpha.70
-    "@mdx-js/react": ^1.6.22
-    "@polkadot/dev": ^0.62.7
-    "@polkadot/typegen": ^4.5.1
-    clsx: ^1.1.1
-    react: ^17.0.1
-    react-dom: ^17.0.1
-  languageName: unknown
-  linkType: soft
 
 "portfinder@npm:^1.0.26":
   version: 1.0.28

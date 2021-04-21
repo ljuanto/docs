@@ -1,31 +1,31 @@
 const BASE_URL = process.env.NODE_ENV === 'development' ? '/' : '/docs/';
 
 module.exports = {
-  title: 'polkadot{.js}',
-  tagline: 'Polkadot does JavaScript',
+  title: 'crust{.js}',
+  tagline: 'Crust does JavaScript',
   url: 'https://polkadot.js.org',
   baseUrl: BASE_URL,
   onBrokenLinks: 'throw',
   favicon: 'img/favicon.ico',
-  organizationName: 'polkadot-js',
+  organizationName: 'crustio',
   onBrokenLinks: 'warn',
   projectName: 'docs',
   stylesheets: [],
   themeConfig: {
     navbar: {
-      title: 'polkadot{.js}',
+      title: 'crust{.js}',
       logo: {
-        alt: 'polkadot{.js}',
+        alt: 'crust{.js}',
         src: 'img/logo.svg',
       },
       items: [
         {
-          href: 'https://polkadot.js.org/apps/',
+          href: 'https://apps.crust.network/',
           label: 'Apps UI (Wallet)',
           position: 'right',
         },
         {
-          href: 'https://github.com/polkadot-js/docs',
+          href: 'https://github.com/crustio/docs-1',
           label: 'GitHub',
           position: 'right',
         },
@@ -37,12 +37,12 @@ module.exports = {
     ['@docusaurus/preset-classic', {
       docs: {
         sidebarPath: require.resolve('./sidebars.js'),
-        editUrl: 'https://github.com/polkadot-js/docs/edit/master/',
+        editUrl: 'https://github.com/crustio/docs-1/edit/master/',
         routeBasePath: '/'
       },
       blog: {
         showReadingTime: true,
-        editUrl: 'https://github.com/polkadot-js/docs/edit/master/',
+        editUrl: 'https://github.com/crustio/docs-1/edit/master/',
       },
       theme: {
         customCss: require.resolve('./src/css/custom.css'),
