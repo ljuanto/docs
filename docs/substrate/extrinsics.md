@@ -6,6 +6,8 @@ The following sections contain Extrinsics methods are part of the default Substr
 
 (NOTE: These were generated from a static/snapshot view of a recent Substrate master node. Some items may not be available in older nodes, or in any customized implementations.)
 
+- **[assets](#assets)**
+
 - **[authorship](#authorship)**
 
 - **[babe](#babe)**
@@ -14,15 +16,17 @@ The following sections contain Extrinsics methods are part of the default Substr
 
 - **[bounties](#bounties)**
 
-- **[candy](#candy)**
-
-- **[claims](#claims)**
+- **[contracts](#contracts)**
 
 - **[council](#council)**
 
 - **[democracy](#democracy)**
 
+- **[electionProviderMultiPhase](#electionprovidermultiphase)**
+
 - **[elections](#elections)**
+
+- **[gilt](#gilt)**
 
 - **[grandpa](#grandpa)**
 
@@ -32,17 +36,23 @@ The following sections contain Extrinsics methods are part of the default Substr
 
 - **[indices](#indices)**
 
-- **[market](#market)**
+- **[lottery](#lottery)**
+
+- **[multisig](#multisig)**
+
+- **[proxy](#proxy)**
+
+- **[recovery](#recovery)**
 
 - **[scheduler](#scheduler)**
 
 - **[session](#session)**
 
+- **[society](#society)**
+
 - **[staking](#staking)**
 
 - **[sudo](#sudo)**
-
-- **[swork](#swork)**
 
 - **[system](#system)**
 
@@ -58,6 +68,409 @@ The following sections contain Extrinsics methods are part of the default Substr
 
 - **[utility](#utility)**
 
+- **[vesting](#vesting)**
+
+
+___
+
+
+## assets
+ 
+### approveTransfer(id: `Compact<AssetId>`, delegate: `LookupSource`, amount: `Compact<TAssetBalance>`)
+- **interface**: `api.tx.assets.approveTransfer`
+- **summary**:   Approve an amount of asset for transfer by a delegated third-party account. 
+
+  Origin must be Signed. 
+
+  Ensures that `ApprovalDeposit` worth of `Currency` is reserved from signing account for the purpose of holding the approval. If some non-zero amount of assets is already approved from signing account to `delegate`, then it is topped up or unreserved to meet the right value. 
+
+  NOTE: The signing account does not need to own `amount` of assets at the point of making this call. 
+
+  - `id`: The identifier of the asset. 
+
+  - `delegate`: The account to delegate permission to transfer asset.
+
+  - `amount`: The amount of asset that may be transferred by `delegate`. If there isalready an approval in place, then this acts additively. 
+
+  Emits `ApprovedTransfer` on success. 
+
+  Weight: `O(1)` 
+ 
+### burn(id: `Compact<AssetId>`, who: `LookupSource`, amount: `Compact<TAssetBalance>`)
+- **interface**: `api.tx.assets.burn`
+- **summary**:   Reduce the balance of `who` by as much as possible up to `amount` assets of `id`. 
+
+  Origin must be Signed and the sender should be the Manager of the asset `id`. 
+
+  Bails with `BalanceZero` if the `who` is already dead. 
+
+  - `id`: The identifier of the asset to have some amount burned. 
+
+  - `who`: The account to be debited from.
+
+  - `amount`: The maximum amount by which `who`'s balance should be reduced.
+
+  Emits `Burned` with the actual amount burned. If this takes the balance to below the minimum for the asset, then the amount burned is increased to take it to zero. 
+
+  Weight: `O(1)` Modes: Post-existence of `who`; Pre & post Zombie-status of `who`. 
+ 
+### cancelApproval(id: `Compact<AssetId>`, delegate: `LookupSource`)
+- **interface**: `api.tx.assets.cancelApproval`
+- **summary**:   Cancel all of some asset approved for delegated transfer by a third-party account. 
+
+  Origin must be Signed and there must be an approval in place between signer and `delegate`. 
+
+  Unreserves any deposit previously reserved by `approve_transfer` for the approval. 
+
+  - `id`: The identifier of the asset. 
+
+  - `delegate`: The account delegated permission to transfer asset.
+
+  Emits `ApprovalCancelled` on success. 
+
+  Weight: `O(1)` 
+ 
+### clearMetadata(id: `Compact<AssetId>`)
+- **interface**: `api.tx.assets.clearMetadata`
+- **summary**:   Clear the metadata for an asset. 
+
+  Origin must be Signed and the sender should be the Owner of the asset `id`. 
+
+  Any deposit is freed for the asset owner. 
+
+  - `id`: The identifier of the asset to clear. 
+
+  Emits `MetadataCleared`. 
+
+  Weight: `O(1)` 
+ 
+### create(id: `Compact<AssetId>`, admin: `LookupSource`, min_balance: `TAssetBalance`)
+- **interface**: `api.tx.assets.create`
+- **summary**:   Issue a new class of fungible assets from a public origin. 
+
+  This new asset class has no assets initially and its owner is the origin. 
+
+  The origin must be Signed and the sender must have sufficient funds free. 
+
+  Funds of sender are reserved by `AssetDeposit`. 
+
+  Parameters: 
+
+  - `id`: The identifier of the new asset. This must not be currently in use to identifyan existing asset. 
+
+  - `admin`: The admin of this class of assets. The admin is the initial address of eachmember of the asset class's admin team. 
+
+  - `min_balance`: The minimum balance of this new asset that any single account musthave. If an account's balance is reduced below this, then it collapses to zero. 
+
+  Emits `Created` event when successful. 
+
+  Weight: `O(1)` 
+ 
+### destroy(id: `Compact<AssetId>`, witness: `AssetDestroyWitness`)
+- **interface**: `api.tx.assets.destroy`
+- **summary**:   Destroy a class of fungible assets. 
+
+  The origin must conform to `ForceOrigin` or must be Signed and the sender must be the owner of the asset `id`. 
+
+  - `id`: The identifier of the asset to be destroyed. This must identify an existing asset. 
+
+  Emits `Destroyed` event when successful. 
+
+  Weight: `O(c + p + a)` where: 
+
+  - `c = (witness.accounts - witness.sufficients)`
+
+  - `s = witness.sufficients`
+
+  - `a = witness.approvals`
+ 
+### forceAssetStatus(id: `Compact<AssetId>`, owner: `LookupSource`, issuer: `LookupSource`, admin: `LookupSource`, freezer: `LookupSource`, min_balance: `Compact<TAssetBalance>`, is_sufficient: `bool`, is_frozen: `bool`)
+- **interface**: `api.tx.assets.forceAssetStatus`
+- **summary**:   Alter the attributes of a given asset. 
+
+  Origin must be `ForceOrigin`. 
+
+  - `id`: The identifier of the asset. 
+
+  - `owner`: The new Owner of this asset.
+
+  - `issuer`: The new Issuer of this asset.
+
+  - `admin`: The new Admin of this asset.
+
+  - `freezer`: The new Freezer of this asset.
+
+  - `min_balance`: The minimum balance of this new asset that any single account musthave. If an account's balance is reduced below this, then it collapses to zero. 
+
+  - `is_sufficient`: Whether a non-zero balance of this asset is deposit of sufficientvalue to account for the state bloat associated with its balance storage. If set to `true`, then non-zero balances may be stored without a `consumer` reference (and thus an ED in the Balances pallet or whatever else is used to control user-account state growth). 
+
+  - `is_frozen`: Whether this asset class is frozen except for permissioned/admininstructions. 
+
+  Emits `AssetStatusChanged` with the identity of the asset. 
+
+  Weight: `O(1)` 
+ 
+### forceCancelApproval(id: `Compact<AssetId>`, owner: `LookupSource`, delegate: `LookupSource`)
+- **interface**: `api.tx.assets.forceCancelApproval`
+- **summary**:   Cancel all of some asset approved for delegated transfer by a third-party account. 
+
+  Origin must be either ForceOrigin or Signed origin with the signer being the Admin account of the asset `id`. 
+
+  Unreserves any deposit previously reserved by `approve_transfer` for the approval. 
+
+  - `id`: The identifier of the asset. 
+
+  - `delegate`: The account delegated permission to transfer asset.
+
+  Emits `ApprovalCancelled` on success. 
+
+  Weight: `O(1)` 
+ 
+### forceClearMetadata(id: `Compact<AssetId>`)
+- **interface**: `api.tx.assets.forceClearMetadata`
+- **summary**:   Clear the metadata for an asset. 
+
+  Origin must be ForceOrigin. 
+
+  Any deposit is returned. 
+
+  - `id`: The identifier of the asset to clear. 
+
+  Emits `MetadataCleared`. 
+
+  Weight: `O(1)` 
+ 
+### forceCreate(id: `Compact<AssetId>`, owner: `LookupSource`, is_sufficient: `bool`, min_balance: `Compact<TAssetBalance>`)
+- **interface**: `api.tx.assets.forceCreate`
+- **summary**:   Issue a new class of fungible assets from a privileged origin. 
+
+  This new asset class has no assets initially. 
+
+  The origin must conform to `ForceOrigin`. 
+
+  Unlike `create`, no funds are reserved. 
+
+  - `id`: The identifier of the new asset. This must not be currently in use to identify an existing asset. 
+
+  - `owner`: The owner of this class of assets. The owner has full superuser permissionsover this asset, but may later change and configure the permissions using `transfer_ownership` and `set_team`. 
+
+  - `max_zombies`: The total number of accounts which may hold assets in this class yethave no existential deposit. 
+
+  - `min_balance`: The minimum balance of this new asset that any single account musthave. If an account's balance is reduced below this, then it collapses to zero. 
+
+  Emits `ForceCreated` event when successful. 
+
+  Weight: `O(1)` 
+ 
+### forceSetMetadata(id: `Compact<AssetId>`, name: `Bytes`, symbol: `Bytes`, decimals: `u8`, is_frozen: `bool`)
+- **interface**: `api.tx.assets.forceSetMetadata`
+- **summary**:   Force the metadata for an asset to some value. 
+
+  Origin must be ForceOrigin. 
+
+  Any deposit is left alone. 
+
+  - `id`: The identifier of the asset to update. 
+
+  - `name`: The user friendly name of this asset. Limited in length by `StringLimit`.
+
+  - `symbol`: The exchange symbol for this asset. Limited in length by `StringLimit`.
+
+  - `decimals`: The number of decimals this asset uses to represent one unit.
+
+  Emits `MetadataSet`. 
+
+  Weight: `O(N + S)` where N and S are the length of the name and symbol respectively. 
+ 
+### forceTransfer(id: `Compact<AssetId>`, source: `LookupSource`, dest: `LookupSource`, amount: `Compact<TAssetBalance>`)
+- **interface**: `api.tx.assets.forceTransfer`
+- **summary**:   Move some assets from one account to another. 
+
+  Origin must be Signed and the sender should be the Admin of the asset `id`. 
+
+  - `id`: The identifier of the asset to have some amount transferred. 
+
+  - `source`: The account to be debited.
+
+  - `dest`: The account to be credited.
+
+  - `amount`: The amount by which the `source`'s balance of assets should be reduced and`dest`'s balance increased. The amount actually transferred may be slightly greater in the case that the transfer would otherwise take the `source` balance above zero but below the minimum balance. Must be greater than zero. 
+
+  Emits `Transferred` with the actual amount transferred. If this takes the source balance to below the minimum for the asset, then the amount transferred is increased to take it to zero. 
+
+  Weight: `O(1)` Modes: Pre-existence of `dest`; Post-existence of `source`; Prior & post zombie-status of `source`; Account pre-existence of `dest`. 
+ 
+### freeze(id: `Compact<AssetId>`, who: `LookupSource`)
+- **interface**: `api.tx.assets.freeze`
+- **summary**:   Disallow further unprivileged transfers from an account. 
+
+  Origin must be Signed and the sender should be the Freezer of the asset `id`. 
+
+  - `id`: The identifier of the asset to be frozen. 
+
+  - `who`: The account to be frozen.
+
+  Emits `Frozen`. 
+
+  Weight: `O(1)` 
+ 
+### freezeAsset(id: `Compact<AssetId>`)
+- **interface**: `api.tx.assets.freezeAsset`
+- **summary**:   Disallow further unprivileged transfers for the asset class. 
+
+  Origin must be Signed and the sender should be the Freezer of the asset `id`. 
+
+  - `id`: The identifier of the asset to be frozen. 
+
+  Emits `Frozen`. 
+
+  Weight: `O(1)` 
+ 
+### mint(id: `Compact<AssetId>`, beneficiary: `LookupSource`, amount: `Compact<TAssetBalance>`)
+- **interface**: `api.tx.assets.mint`
+- **summary**:   Mint assets of a particular class. 
+
+  The origin must be Signed and the sender must be the Issuer of the asset `id`. 
+
+  - `id`: The identifier of the asset to have some amount minted. 
+
+  - `beneficiary`: The account to be credited with the minted assets.
+
+  - `amount`: The amount of the asset to be minted.
+
+  Emits `Destroyed` event when successful. 
+
+  Weight: `O(1)` Modes: Pre-existing balance of `beneficiary`; Account pre-existence of `beneficiary`. 
+ 
+### setMetadata(id: `Compact<AssetId>`, name: `Bytes`, symbol: `Bytes`, decimals: `u8`)
+- **interface**: `api.tx.assets.setMetadata`
+- **summary**:   Set the metadata for an asset. 
+
+  Origin must be Signed and the sender should be the Owner of the asset `id`. 
+
+  Funds of sender are reserved according to the formula: `MetadataDepositBase + MetadataDepositPerByte * (name.len + symbol.len)` taking into account any already reserved funds. 
+
+  - `id`: The identifier of the asset to update. 
+
+  - `name`: The user friendly name of this asset. Limited in length by `StringLimit`.
+
+  - `symbol`: The exchange symbol for this asset. Limited in length by `StringLimit`.
+
+  - `decimals`: The number of decimals this asset uses to represent one unit.
+
+  Emits `MetadataSet`. 
+
+  Weight: `O(1)` 
+ 
+### setTeam(id: `Compact<AssetId>`, issuer: `LookupSource`, admin: `LookupSource`, freezer: `LookupSource`)
+- **interface**: `api.tx.assets.setTeam`
+- **summary**:   Change the Issuer, Admin and Freezer of an asset. 
+
+  Origin must be Signed and the sender should be the Owner of the asset `id`. 
+
+  - `id`: The identifier of the asset to be frozen. 
+
+  - `issuer`: The new Issuer of this asset.
+
+  - `admin`: The new Admin of this asset.
+
+  - `freezer`: The new Freezer of this asset.
+
+  Emits `TeamChanged`. 
+
+  Weight: `O(1)` 
+ 
+### thaw(id: `Compact<AssetId>`, who: `LookupSource`)
+- **interface**: `api.tx.assets.thaw`
+- **summary**:   Allow unprivileged transfers from an account again. 
+
+  Origin must be Signed and the sender should be the Admin of the asset `id`. 
+
+  - `id`: The identifier of the asset to be frozen. 
+
+  - `who`: The account to be unfrozen.
+
+  Emits `Thawed`. 
+
+  Weight: `O(1)` 
+ 
+### thawAsset(id: `Compact<AssetId>`)
+- **interface**: `api.tx.assets.thawAsset`
+- **summary**:   Allow unprivileged transfers for the asset again. 
+
+  Origin must be Signed and the sender should be the Admin of the asset `id`. 
+
+  - `id`: The identifier of the asset to be frozen. 
+
+  Emits `Thawed`. 
+
+  Weight: `O(1)` 
+ 
+### transfer(id: `Compact<AssetId>`, target: `LookupSource`, amount: `Compact<TAssetBalance>`)
+- **interface**: `api.tx.assets.transfer`
+- **summary**:   Move some assets from the sender account to another. 
+
+  Origin must be Signed. 
+
+  - `id`: The identifier of the asset to have some amount transferred. 
+
+  - `target`: The account to be credited.
+
+  - `amount`: The amount by which the sender's balance of assets should be reduced and`target`'s balance increased. The amount actually transferred may be slightly greater in the case that the transfer would otherwise take the sender balance above zero but below the minimum balance. Must be greater than zero. 
+
+  Emits `Transferred` with the actual amount transferred. If this takes the source balance to below the minimum for the asset, then the amount transferred is increased to take it to zero. 
+
+  Weight: `O(1)` Modes: Pre-existence of `target`; Post-existence of sender; Prior & post zombie-status of sender; Account pre-existence of `target`. 
+ 
+### transferApproved(id: `Compact<AssetId>`, owner: `LookupSource`, destination: `LookupSource`, amount: `Compact<TAssetBalance>`)
+- **interface**: `api.tx.assets.transferApproved`
+- **summary**:   Transfer some asset balance from a previously delegated account to some third-party account. 
+
+  Origin must be Signed and there must be an approval in place by the `owner` to the signer. 
+
+  If the entire amount approved for transfer is transferred, then any deposit previously reserved by `approve_transfer` is unreserved. 
+
+  - `id`: The identifier of the asset. 
+
+  - `owner`: The account which previously approved for a transfer of at least `amount` andfrom which the asset balance will be withdrawn. 
+
+  - `destination`: The account to which the asset balance of `amount` will be transferred.
+
+  - `amount`: The amount of assets to transfer.
+
+  Emits `TransferredApproved` on success. 
+
+  Weight: `O(1)` 
+ 
+### transferKeepAlive(id: `Compact<AssetId>`, target: `LookupSource`, amount: `Compact<TAssetBalance>`)
+- **interface**: `api.tx.assets.transferKeepAlive`
+- **summary**:   Move some assets from the sender account to another, keeping the sender account alive. 
+
+  Origin must be Signed. 
+
+  - `id`: The identifier of the asset to have some amount transferred. 
+
+  - `target`: The account to be credited.
+
+  - `amount`: The amount by which the sender's balance of assets should be reduced and`target`'s balance increased. The amount actually transferred may be slightly greater in the case that the transfer would otherwise take the sender balance above zero but below the minimum balance. Must be greater than zero. 
+
+  Emits `Transferred` with the actual amount transferred. If this takes the source balance to below the minimum for the asset, then the amount transferred is increased to take it to zero. 
+
+  Weight: `O(1)` Modes: Pre-existence of `target`; Post-existence of sender; Prior & post zombie-status of sender; Account pre-existence of `target`. 
+ 
+### transferOwnership(id: `Compact<AssetId>`, owner: `LookupSource`)
+- **interface**: `api.tx.assets.transferOwnership`
+- **summary**:   Change the Owner of an asset. 
+
+  Origin must be Signed and the sender should be the Owner of the asset `id`. 
+
+  - `id`: The identifier of the asset. 
+
+  - `owner`: The new Owner of this asset.
+
+  Emits `OwnerChanged`. 
+
+  Weight: `O(1)` 
 
 ___
 
@@ -72,6 +485,10 @@ ___
 
 
 ## babe
+ 
+### planConfigChange(config: `NextConfigDescriptor`)
+- **interface**: `api.tx.babe.planConfigChange`
+- **summary**:   Plan an epoch config change. The epoch config change is recorded and will be enacted on the next call to `enact_epoch_change`. The config will be activated one epoch after. Multiple calls to this method will replace any existing planned config change that had not been enacted yet. 
  
 ### reportEquivocation(equivocation_proof: `BabeEquivocationProof`, key_owner_proof: `KeyOwnerProof`)
 - **interface**: `api.tx.babe.reportEquivocation`
@@ -116,7 +533,7 @@ ___
 
   99% of the time you want [`transfer`] instead. 
 
-  [`transfer`]: struct.Module.html#method.transfer  
+  [`transfer`]: struct.Pallet.html#method.transfer  
 
 ___
 
@@ -224,85 +641,69 @@ ___
 ___
 
 
-## candy
+## contracts
  
-### burn(target: `LookupSource`, amount: `Compact<Balance>`)
-- **interface**: `api.tx.candy.burn`
-- **summary**:   Destroy candy from `target` account. Only been called by `root` 
+### call(dest: `LookupSource`, value: `Compact<BalanceOf>`, gas_limit: `Compact<Weight>`, data: `Bytes`)
+- **interface**: `api.tx.contracts.call`
+- **summary**:   Makes a call to an account, optionally transferring some balance. 
 
-   
+  * If the account is a smart-contract account, the associated code will be executed and any value will be transferred. 
+
+  * If the account is a regular account, any value will be transferred.
+
+  * If no account exists and the call value is not less than `existential_deposit`,a regular account will be created and any value will be transferred. 
  
-### issue(target: `LookupSource`, total: `Compact<Balance>`)
-- **interface**: `api.tx.candy.issue`
-- **summary**:   Issue crust candy. There are, and will only ever be, `total` such candy and they'll all belong to the `root` initially. 
+### claimSurcharge(dest: `AccountId`, aux_sender: `Option<AccountId>`)
+- **interface**: `api.tx.contracts.claimSurcharge`
+- **summary**:   Allows block producers to claim a small reward for evicting a contract. If a block producer fails to do so, a regular users will be allowed to claim the reward. 
 
-   
+  In case of a successful eviction no fees are charged from the sender. However, the reward is capped by the total amount of rent that was payed by the contract while it was alive. 
+
+  If contract is not evicted as a result of this call, [`Error::ContractNotEvictable`] is returned and the sender is not eligible for the reward. 
  
-### transfer(target: `LookupSource`, amount: `Compact<Balance>`)
-- **interface**: `api.tx.candy.transfer`
-- **summary**:   Move candy from one holder to another. 
+### instantiate(endowment: `Compact<BalanceOf>`, gas_limit: `Compact<Weight>`, code_hash: `CodeHash`, data: `Bytes`, salt: `Bytes`)
+- **interface**: `api.tx.contracts.instantiate`
+- **summary**:   Instantiates a contract from a previously deployed wasm binary. 
 
-   
-
-___
-
-
-## claims
+  This function is identical to [`Self::instantiate_with_code`] but without the code deployment step. Instead, the `code_hash` of an on-chain deployed wasm binary must be supplied. 
  
-### bondEth(address: `EthereumAddress`)
-- **interface**: `api.tx.claims.bondEth`
-- **summary**:   Register a Ethereum Address for an given account 
+### instantiateWithCode(endowment: `Compact<BalanceOf>`, gas_limit: `Compact<Weight>`, code: `Bytes`, data: `Bytes`, salt: `Bytes`)
+- **interface**: `api.tx.contracts.instantiateWithCode`
+- **summary**:   Instantiates a new contract from the supplied `code` optionally transferring some balance. 
 
-   
+  This is the only function that can deploy new code to the chain. 
+
+  #### Parameters 
+
+  * `endowment`: The balance to transfer from the `origin` to the newly created contract. 
+
+  * `gas_limit`: The gas limit enforced when executing the constructor.
+
+  * `code`: The contract code to deploy in raw bytes.
+
+  * `data`: The input data to pass to the contract constructor.
+
+  * `salt`: Used for the address derivation. See [`Pallet::contract_address`].
+
+  Instantiation is executed as follows: 
+
+  - The supplied `code` is instrumented, deployed, and a `code_hash` is created for that code. 
+
+  - If the `code_hash` already exists on the chain the underlying `code` will be shared.
+
+  - The destination address is computed based on the sender, code_hash and the salt.
+
+  - The smart-contract account is created at the computed address.
+
+  - The `endowment` is transferred to the new account.
+
+  - The `deploy` function is executed in the context of the newly-created account.
  
-### changeMiner(new_miner: `LookupSource`)
-- **interface**: `api.tx.claims.changeMiner`
-- **summary**:   Change miner 
+### updateSchedule(schedule: `Schedule`)
+- **interface**: `api.tx.contracts.updateSchedule`
+- **summary**:   Updates the schedule for metering contracts. 
 
-  The dispatch origin for this call must be _Root_. 
-
-  Parameters: 
-
-  - `new_miner`: The new miner's address
- 
-### changeSuperior(new_superior: `LookupSource`)
-- **interface**: `api.tx.claims.changeSuperior`
-- **summary**:   Change superior 
-
-  The dispatch origin for this call must be _Root_. 
-
-  Parameter: 
-
-  - `new_superior`: The new superior's address
- 
-### claim(dest: `AccountId`, tx: `EthereumTxHash`, sig: `EcdsaSignature`)
-- **interface**: `api.tx.claims.claim`
- 
-### claimCru18(dest: `AccountId`, sig: `EcdsaSignature`)
-- **interface**: `api.tx.claims.claimCru18`
-- **summary**:   Make real cru18 claims, should judge the ethereum signature 
- 
-### mintClaim(tx: `EthereumTxHash`, who: `EthereumAddress`, value: `BalanceOf`)
-- **interface**: `api.tx.claims.mintClaim`
-- **summary**:   Mint the claim 
- 
-### mintCru18Claim(address: `EthereumAddress`, amount: `BalanceOf`)
-- **interface**: `api.tx.claims.mintCru18Claim`
-- **summary**:   Mint the cru18 erc20 CRU18 locked token 
- 
-### setClaimLimit(limit: `BalanceOf`)
-- **interface**: `api.tx.claims.setClaimLimit`
-- **summary**:   Set claim limit 
- 
-### setCru18Miner(new_cru18_miner: `LookupSource`)
-- **interface**: `api.tx.claims.setCru18Miner`
-- **summary**:   Sets cru18 miner 
-
-  The dispatch origin for this call must be _Root_. 
-
-  Parameters: 
-
-  - `new_cru18_miner`: The new cru18 miner's address, this is a cold pk needs to be offline
+  The schedule's version cannot be less than the version of the stored schedule. If a schedule does not change the instruction weights the version does not need to be increased. Therefore we allow storing a schedule that has the same version as the stored one. 
 
 ___
 
@@ -693,7 +1094,34 @@ ___
 ___
 
 
+## electionProviderMultiPhase
+ 
+### submitUnsigned(solution: `RawSolution`, witness: `SolutionOrSnapshotSize`)
+- **interface**: `api.tx.electionProviderMultiPhase.submitUnsigned`
+- **summary**:   Submit a solution for the unsigned phase. 
+
+  The dispatch origin fo this call must be __none__. 
+
+  This submission is checked on the fly. Moreover, this unsigned solution is only validated when submitted to the pool from the **local** node. Effectively, this means that only active validators can submit this transaction when authoring a block (similar to an inherent). 
+
+  To prevent any incorrect solution (and thus wasted time/weight), this transaction will panic if the solution submitted by the validator is invalid in any way, effectively putting their authoring reward at risk. 
+
+  No deposit or reward is associated with this submission. 
+
+___
+
+
 ## elections
+ 
+### cleanDefunctVoters(_num_voters: `u32`, _num_defunct: `u32`)
+- **interface**: `api.tx.elections.cleanDefunctVoters`
+- **summary**:   Clean all voters who are defunct (i.e. they do not serve any purpose at all). The deposit of the removed voters are returned. 
+
+  This is an root function to be used only for cleaning the state. 
+
+  The dispatch origin of this call must be root. 
+
+   
  
 ### removeMember(who: `LookupSource`, has_replacement: `bool`)
 - **interface**: `api.tx.elections.removeMember`
@@ -701,51 +1129,45 @@ ___
 
   If a runner-up is available, then the best runner-up will be removed and replaces the outgoing member. Otherwise, a new phragmen election is started. 
 
+  The dispatch origin of this call must be root. 
+
   Note that this does not affect the designated block number of the next election. 
 
    
  
 ### removeVoter()
 - **interface**: `api.tx.elections.removeVoter`
-- **summary**:   Remove `origin` as a voter. This removes the lock and returns the bond. 
+- **summary**:   Remove `origin` as a voter. 
 
-   
+  This removes the lock and returns the deposit. 
+
+  The dispatch origin of this call must be signed and be a voter. 
  
 ### renounceCandidacy(renouncing: `Renouncing`)
 - **interface**: `api.tx.elections.renounceCandidacy`
 - **summary**:   Renounce one's intention to be a candidate for the next election round. 3 potential outcomes exist: 
 
-  - `origin` is a candidate and not elected in any set. In this case, the bond is  unreserved, returned and origin is removed as a candidate. 
+  - `origin` is a candidate and not elected in any set. In this case, the deposit is   unreserved, returned and origin is removed as a candidate. 
 
-  - `origin` is a current runner-up. In this case, the bond is unreserved, returned and  origin is removed as a runner-up. 
+  - `origin` is a current runner-up. In this case, the deposit is unreserved, returned and  origin is removed as a runner-up. 
 
-  - `origin` is a current member. In this case, the bond is unreserved and origin is  removed as a member, consequently not being a candidate for the next round anymore.   Similar to [`remove_voter`], if replacement runners exists, they are immediately used.  
- 
-### reportDefunctVoter(defunct: `DefunctVoter`)
-- **interface**: `api.tx.elections.reportDefunctVoter`
-- **summary**:   Report `target` for being an defunct voter. In case of a valid report, the reporter is rewarded by the bond amount of `target`. Otherwise, the reporter itself is removed and their bond is slashed. 
+  - `origin` is a current member. In this case, the deposit is unreserved and origin is  removed as a member, consequently not being a candidate for the next round anymore.   Similar to [`remove_members`], if replacement runners exists, they are immediately used.   If the prime is renouncing, then no prime will exist until the next round. 
 
-  A defunct voter is defined to be: 
-
-    - a voter whose current submitted votes are all invalid. i.e. all of them are no    longer a candidate nor an active member or a runner-up. 
-
-  
-
-  The origin must provide the number of current candidates and votes of the reported target for the purpose of accurate weight calculation. 
+  The dispatch origin of this call must be signed, and have one of the above roles. 
 
    
  
 ### submitCandidacy(candidate_count: `Compact<u32>`)
 - **interface**: `api.tx.elections.submitCandidacy`
-- **summary**:   Submit oneself for candidacy. 
+- **summary**:   Submit oneself for candidacy. A fixed amount of deposit is recorded. 
 
-  A candidate will either: 
+  All candidates are wiped at the end of the term. They either become a member/runner-up, or leave the system while their deposit is slashed. 
 
-    - Lose at the end of the term and forfeit their deposit.
+  The dispatch origin of this call must be signed. 
 
-    - Win and become a member. Members will eventually get their stash back.
+  #### Warning 
 
-    - Become a runner-up. Runners-ups are reserved members in case one gets forcefully    removed. 
+  Even if a candidate ends up being a member, they must call [`Call::renounce_candidacy`] to get their deposit back. Losing the spot in an election will always lead to a slash. 
 
    
  
@@ -753,7 +1175,7 @@ ___
 - **interface**: `api.tx.elections.vote`
 - **summary**:   Vote for a set of candidates for the upcoming round of election. This can be called to set the initial votes, or update already existing votes. 
 
-  Upon initial voting, `value` units of `who`'s balance is locked and a bond amount is reserved. 
+  Upon initial voting, `value` units of `who`'s balance is locked and a deposit amount is reserved. The deposit is based on the number of votes and can be updated over time. 
 
   The `votes` should: 
 
@@ -761,9 +1183,60 @@ ___
 
     - be less than the number of possible candidates. Note that all current members and    runners-up are also automatically candidates for the next round. 
 
-  It is the responsibility of the caller to not place all of their balance into the lock and keep some for further transactions. 
+  If `value` is more than `who`'s total balance, then the maximum of the two is used. 
+
+  The dispatch origin of this call must be signed. 
+
+  #### Warning 
+
+  It is the responsibility of the caller to **NOT** place all of their balance into the lock and keep some for further operations. 
 
    
+
+___
+
+
+## gilt
+ 
+### placeBid(amount: `Compact<BalanceOf>`, duration: `u32`)
+- **interface**: `api.tx.gilt.placeBid`
+- **summary**:   Place a bid for a gilt to be issued. 
+
+  Origin must be Signed, and account must have at least `amount` in free balance. 
+
+  - `amount`: The amount of the bid; these funds will be reserved. If the bid is successfully elevated into an issued gilt, then these funds will continue to be reserved until the gilt expires. Must be at least `MinFreeze`. 
+
+  - `duration`: The number of periods for which the funds will be locked if the gilt isissued. It will expire only after this period has elapsed after the point of issuance. Must be greater than 1 and no more than `QueueCount`. 
+
+  Complexities: 
+
+  - `Queues[duration].len()` (just take max).
+ 
+### retractBid(amount: `Compact<BalanceOf>`, duration: `u32`)
+- **interface**: `api.tx.gilt.retractBid`
+- **summary**:   Retract a previously placed bid. 
+
+  Origin must be Signed, and the account should have previously issued a still-active bid of `amount` for `duration`. 
+
+  - `amount`: The amount of the previous bid. 
+
+  - `duration`: The duration of the previous bid.
+ 
+### setTarget(target: `Compact<Perquintill>`)
+- **interface**: `api.tx.gilt.setTarget`
+- **summary**:   Set target proportion of gilt-funds. 
+
+  Origin must be `AdminOrigin`. 
+
+  - `target`: The target proportion of effective issued funds that should be under gilts at any one time. 
+ 
+### thaw(index: `Compact<ActiveIndex>`)
+- **interface**: `api.tx.gilt.thaw`
+- **summary**:   Remove an active but expired gilt. Reserved funds under gilt are freed and balance is adjusted to ensure that the funds grow or shrink to maintain the equivalent proportion of effective total issued funds. 
+
+  Origin must be Signed and the account must be the owner of the gilt of the given index. 
+
+  - `index`: The index of the gilt to be thawed. 
 
 ___
 
@@ -1056,48 +1529,430 @@ ___
 ___
 
 
-## market
+## lottery
  
-### addCollateral(value: `Compact<BalanceOf>`)
-- **interface**: `api.tx.market.addCollateral`
-- **summary**:   Collateral extra amount of currency to accept market order. 
+### buyTicket(call: `Call`)
+- **interface**: `api.tx.lottery.buyTicket`
+- **summary**:   Buy a ticket to enter the lottery. 
+
+  This extrinsic acts as a passthrough function for `call`. In all situations where `call` alone would succeed, this extrinsic should succeed. 
+
+  If `call` is successful, then we will attempt to purchase a ticket, which may fail silently. To detect success of a ticket purchase, you should listen for the `TicketBought` event. 
+
+  This extrinsic must be called by a signed origin. 
+ 
+### setCalls(calls: `Vec<Call>`)
+- **interface**: `api.tx.lottery.setCalls`
+- **summary**:   Set calls in storage which can be used to purchase a lottery ticket. 
+
+  This function only matters if you use the `ValidateCall` implementation provided by this pallet, which uses storage to determine the valid calls. 
+
+  This extrinsic must be called by the Manager origin. 
+ 
+### startLottery(price: `BalanceOf`, length: `BlockNumber`, delay: `BlockNumber`, repeat: `bool`)
+- **interface**: `api.tx.lottery.startLottery`
+- **summary**:   Start a lottery using the provided configuration. 
+
+  This extrinsic must be called by the `ManagerOrigin`. 
+
+  Parameters: 
+
+  * `price`: The cost of a single ticket. 
+
+  * `length`: How long the lottery should run for starting at the current block.
+
+  * `delay`: How long after the lottery end we should wait before picking a winner.
+
+  * `repeat`: If the lottery should repeat when completed.
+ 
+### stopRepeat()
+- **interface**: `api.tx.lottery.stopRepeat`
+- **summary**:   If a lottery is repeating, you can use this to stop the repeat. The lottery will continue to run to completion. 
+
+  This extrinsic must be called by the `ManagerOrigin`. 
+
+___
+
+
+## multisig
+ 
+### approveAsMulti(threshold: `u16`, other_signatories: `Vec<AccountId>`, maybe_timepoint: `Option<Timepoint>`, call_hash: `[u8;32]`, max_weight: `Weight`)
+- **interface**: `api.tx.multisig.approveAsMulti`
+- **summary**:   Register approval for a dispatch to be made from a deterministic composite account if approved by a total of `threshold - 1` of `other_signatories`. 
+
+  Payment: `DepositBase` will be reserved if this is the first approval, plus `threshold` times `DepositFactor`. It is returned once this dispatch happens or is cancelled. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  - `threshold`: The total number of approvals for this dispatch before it is executed. 
+
+  - `other_signatories`: The accounts (other than the sender) who can approve thisdispatch. May not be empty. 
+
+  - `maybe_timepoint`: If this is the first approval, then this must be `None`. If it isnot the first approval, then it must be `Some`, with the timepoint (block number and transaction index) of the first approval transaction. 
+
+  - `call_hash`: The hash of the call to be executed.
+
+  NOTE: If this is the final approval, you will want to use `as_multi` instead. 
 
    
  
-### addPrepaid(cid: `MerkleRoot`, amount: `Compact<BalanceOf>`)
-- **interface**: `api.tx.market.addPrepaid`
-- **summary**:   Place a storage order 
- 
-### calculateReward(cid: `MerkleRoot`)
-- **interface**: `api.tx.market.calculateReward`
-- **summary**:   Calculate the payout 
- 
-### cutCollateral(value: `Compact<BalanceOf>`)
-- **interface**: `api.tx.market.cutCollateral`
-- **summary**:   Decrease collateral amount of currency for market order. 
+### asMulti(threshold: `u16`, other_signatories: `Vec<AccountId>`, maybe_timepoint: `Option<Timepoint>`, call: `OpaqueCall`, store_call: `bool`, max_weight: `Weight`)
+- **interface**: `api.tx.multisig.asMulti`
+- **summary**:   Register approval for a dispatch to be made from a deterministic composite account if approved by a total of `threshold - 1` of `other_signatories`. 
+
+  If there are enough, then dispatch the call. 
+
+  Payment: `DepositBase` will be reserved if this is the first approval, plus `threshold` times `DepositFactor`. It is returned once this dispatch happens or is cancelled. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  - `threshold`: The total number of approvals for this dispatch before it is executed. 
+
+  - `other_signatories`: The accounts (other than the sender) who can approve thisdispatch. May not be empty. 
+
+  - `maybe_timepoint`: If this is the first approval, then this must be `None`. If it isnot the first approval, then it must be `Some`, with the timepoint (block number and transaction index) of the first approval transaction. 
+
+  - `call`: The call to be executed.
+
+  NOTE: Unless this is the final approval, you will generally want to use `approve_as_multi` instead, since it only requires a hash of the call. 
+
+  Result is equivalent to the dispatched result if `threshold` is exactly `1`. Otherwise on success, result is `Ok` and the result from the interior call, if it was executed, may be found in the deposited `MultisigExecuted` event. 
 
    
  
-### placeStorageOrder(cid: `MerkleRoot`, reported_file_size: `u64`, tips: `Compact<BalanceOf>`)
-- **interface**: `api.tx.market.placeStorageOrder`
-- **summary**:   Place a storage order 
- 
-### register(collateral: `Compact<BalanceOf>`)
-- **interface**: `api.tx.market.register`
-- **summary**:   Register to be a merchant, you should provide your storage layer's address info this will require you to collateral first, complexity depends on `Collaterals`(P). 
+### asMultiThreshold1(other_signatories: `Vec<AccountId>`, call: `Call`)
+- **interface**: `api.tx.multisig.asMultiThreshold1`
+- **summary**:   Immediately dispatch a multi-signature call using a single approval from the caller. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  - `other_signatories`: The accounts (other than the sender) who are part of the multi-signature, but do not participate in the approval process. 
+
+  - `call`: The call to be executed.
+
+  Result is equivalent to the dispatched result. 
 
    
  
-### rewardMerchant()
-- **interface**: `api.tx.market.rewardMerchant`
-- **summary**:   Reward the merchant 
+### cancelAsMulti(threshold: `u16`, other_signatories: `Vec<AccountId>`, timepoint: `Timepoint`, call_hash: `[u8;32]`)
+- **interface**: `api.tx.multisig.cancelAsMulti`
+- **summary**:   Cancel a pre-existing, on-going multisig transaction. Any deposit reserved previously for this operation will be unreserved on success. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  - `threshold`: The total number of approvals for this dispatch before it is executed. 
+
+  - `other_signatories`: The accounts (other than the sender) who can approve thisdispatch. May not be empty. 
+
+  - `timepoint`: The timepoint (block number and transaction index) of the first approvaltransaction for this dispatch. 
+
+  - `call_hash`: The hash of the call to be executed.
+
+   
+
+___
+
+
+## proxy
  
-### setMarketSwitch(is_enabled: `bool`)
-- **interface**: `api.tx.market.setMarketSwitch`
-- **summary**:   Set the global switch 
+### addProxy(delegate: `AccountId`, proxy_type: `ProxyType`, delay: `BlockNumber`)
+- **interface**: `api.tx.proxy.addProxy`
+- **summary**:   Register a proxy account for the sender that is able to make calls on its behalf. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  Parameters: 
+
+  - `proxy`: The account that the `caller` would like to make a proxy.
+
+  - `proxy_type`: The permissions allowed for this proxy account.
+
+  - `delay`: The announcement period required of the initial proxy. Will generally bezero. 
+
+   
  
-### showPots()
-- **interface**: `api.tx.market.showPots`
+### announce(real: `AccountId`, call_hash: `CallHashOf`)
+- **interface**: `api.tx.proxy.announce`
+- **summary**:   Publish the hash of a proxy-call that will be made in the future. 
+
+  This must be called some number of blocks before the corresponding `proxy` is attempted if the delay associated with the proxy relationship is greater than zero. 
+
+  No more than `MaxPending` announcements may be made at any one time. 
+
+  This will take a deposit of `AnnouncementDepositFactor` as well as `AnnouncementDepositBase` if there are no other pending announcements. 
+
+  The dispatch origin for this call must be _Signed_ and a proxy of `real`. 
+
+  Parameters: 
+
+  - `real`: The account that the proxy will make a call on behalf of.
+
+  - `call_hash`: The hash of the call to be made by the `real` account.
+
+   
+ 
+### anonymous(proxy_type: `ProxyType`, delay: `BlockNumber`, index: `u16`)
+- **interface**: `api.tx.proxy.anonymous`
+- **summary**:   Spawn a fresh new account that is guaranteed to be otherwise inaccessible, and initialize it with a proxy of `proxy_type` for `origin` sender. 
+
+  Requires a `Signed` origin. 
+
+  - `proxy_type`: The type of the proxy that the sender will be registered as over the new account. This will almost always be the most permissive `ProxyType` possible to allow for maximum flexibility. 
+
+  - `index`: A disambiguation index, in case this is called multiple times in the sametransaction (e.g. with `utility::batch`). Unless you're using `batch` you probably just want to use `0`. 
+
+  - `delay`: The announcement period required of the initial proxy. Will generally bezero. 
+
+  Fails with `Duplicate` if this has already been called in this transaction, from the same sender, with the same parameters. 
+
+  Fails if there are insufficient funds to pay for deposit. 
+
+   TODO: Might be over counting 1 read 
+ 
+### killAnonymous(spawner: `AccountId`, proxy_type: `ProxyType`, index: `u16`, height: `Compact<BlockNumber>`, ext_index: `Compact<u32>`)
+- **interface**: `api.tx.proxy.killAnonymous`
+- **summary**:   Removes a previously spawned anonymous proxy. 
+
+  WARNING: **All access to this account will be lost.** Any funds held in it will be inaccessible. 
+
+  Requires a `Signed` origin, and the sender account must have been created by a call to `anonymous` with corresponding parameters. 
+
+  - `spawner`: The account that originally called `anonymous` to create this account. 
+
+  - `index`: The disambiguation index originally passed to `anonymous`. Probably `0`.
+
+  - `proxy_type`: The proxy type originally passed to `anonymous`.
+
+  - `height`: The height of the chain when the call to `anonymous` was processed.
+
+  - `ext_index`: The extrinsic index in which the call to `anonymous` was processed.
+
+  Fails with `NoPermission` in case the caller is not a previously created anonymous account whose `anonymous` call has corresponding parameters. 
+
+   
+ 
+### proxy(real: `AccountId`, force_proxy_type: `Option<ProxyType>`, call: `Call`)
+- **interface**: `api.tx.proxy.proxy`
+- **summary**:   Dispatch the given `call` from an account that the sender is authorised for through `add_proxy`. 
+
+  Removes any corresponding announcement(s). 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  Parameters: 
+
+  - `real`: The account that the proxy will make a call on behalf of.
+
+  - `force_proxy_type`: Specify the exact proxy type to be used and checked for this call.
+
+  - `call`: The call to be made by the `real` account.
+
+   
+ 
+### proxyAnnounced(delegate: `AccountId`, real: `AccountId`, force_proxy_type: `Option<ProxyType>`, call: `Call`)
+- **interface**: `api.tx.proxy.proxyAnnounced`
+- **summary**:   Dispatch the given `call` from an account that the sender is authorized for through `add_proxy`. 
+
+  Removes any corresponding announcement(s). 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  Parameters: 
+
+  - `real`: The account that the proxy will make a call on behalf of.
+
+  - `force_proxy_type`: Specify the exact proxy type to be used and checked for this call.
+
+  - `call`: The call to be made by the `real` account.
+
+   
+ 
+### rejectAnnouncement(delegate: `AccountId`, call_hash: `CallHashOf`)
+- **interface**: `api.tx.proxy.rejectAnnouncement`
+- **summary**:   Remove the given announcement of a delegate. 
+
+  May be called by a target (proxied) account to remove a call that one of their delegates (`delegate`) has announced they want to execute. The deposit is returned. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  Parameters: 
+
+  - `delegate`: The account that previously announced the call.
+
+  - `call_hash`: The hash of the call to be made.
+
+   
+ 
+### removeAnnouncement(real: `AccountId`, call_hash: `CallHashOf`)
+- **interface**: `api.tx.proxy.removeAnnouncement`
+- **summary**:   Remove a given announcement. 
+
+  May be called by a proxy account to remove a call they previously announced and return the deposit. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  Parameters: 
+
+  - `real`: The account that the proxy will make a call on behalf of.
+
+  - `call_hash`: The hash of the call to be made by the `real` account.
+
+   
+ 
+### removeProxies()
+- **interface**: `api.tx.proxy.removeProxies`
+- **summary**:   Unregister all proxy accounts for the sender. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  WARNING: This may be called on accounts created by `anonymous`, however if done, then the unreserved fees will be inaccessible. **All access to this account will be lost.** 
+
+   
+ 
+### removeProxy(delegate: `AccountId`, proxy_type: `ProxyType`, delay: `BlockNumber`)
+- **interface**: `api.tx.proxy.removeProxy`
+- **summary**:   Unregister a proxy account for the sender. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  Parameters: 
+
+  - `proxy`: The account that the `caller` would like to remove as a proxy.
+
+  - `proxy_type`: The permissions currently enabled for the removed proxy account.
+
+   
+
+___
+
+
+## recovery
+ 
+### asRecovered(account: `AccountId`, call: `Call`)
+- **interface**: `api.tx.recovery.asRecovered`
+- **summary**:   Send a call through a recovered account. 
+
+  The dispatch origin for this call must be _Signed_ and registered to be able to make calls on behalf of the recovered account. 
+
+  Parameters: 
+
+  - `account`: The recovered account you want to make a call on-behalf-of.
+
+  - `call`: The call you want to make with the recovered account.
+
+   
+ 
+### cancelRecovered(account: `AccountId`)
+- **interface**: `api.tx.recovery.cancelRecovered`
+- **summary**:   Cancel the ability to use `as_recovered` for `account`. 
+
+  The dispatch origin for this call must be _Signed_ and registered to be able to make calls on behalf of the recovered account. 
+
+  Parameters: 
+
+  - `account`: The recovered account you are able to call on-behalf-of.
+
+   
+ 
+### claimRecovery(account: `AccountId`)
+- **interface**: `api.tx.recovery.claimRecovery`
+- **summary**:   Allow a successful rescuer to claim their recovered account. 
+
+  The dispatch origin for this call must be _Signed_ and must be a "rescuer" who has successfully completed the account recovery process: collected `threshold` or more vouches, waited `delay_period` blocks since initiation. 
+
+  Parameters: 
+
+  - `account`: The lost account that you want to claim has been successfully  recovered by you. 
+
+   
+ 
+### closeRecovery(rescuer: `AccountId`)
+- **interface**: `api.tx.recovery.closeRecovery`
+- **summary**:   As the controller of a recoverable account, close an active recovery process for your account. 
+
+  Payment: By calling this function, the recoverable account will receive the recovery deposit `RecoveryDeposit` placed by the rescuer. 
+
+  The dispatch origin for this call must be _Signed_ and must be a recoverable account with an active recovery process for it. 
+
+  Parameters: 
+
+  - `rescuer`: The account trying to rescue this recoverable account.
+
+   
+ 
+### createRecovery(friends: `Vec<AccountId>`, threshold: `u16`, delay_period: `BlockNumber`)
+- **interface**: `api.tx.recovery.createRecovery`
+- **summary**:   Create a recovery configuration for your account. This makes your account recoverable. 
+
+  Payment: `ConfigDepositBase` + `FriendDepositFactor` * #_of_friends balance will be reserved for storing the recovery configuration. This deposit is returned in full when the user calls `remove_recovery`. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  Parameters: 
+
+  - `friends`: A list of friends you trust to vouch for recovery attempts.  Should be ordered and contain no duplicate values. 
+
+  - `threshold`: The number of friends that must vouch for a recovery attempt  before the account can be recovered. Should be less than or equal to   the length of the list of friends. 
+
+  - `delay_period`: The number of blocks after a recovery attempt is initialized  that needs to pass before the account can be recovered. 
+
+   
+ 
+### initiateRecovery(account: `AccountId`)
+- **interface**: `api.tx.recovery.initiateRecovery`
+- **summary**:   Initiate the process for recovering a recoverable account. 
+
+  Payment: `RecoveryDeposit` balance will be reserved for initiating the recovery process. This deposit will always be repatriated to the account trying to be recovered. See `close_recovery`. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  Parameters: 
+
+  - `account`: The lost account that you want to recover. This account  needs to be recoverable (i.e. have a recovery configuration). 
+
+   
+ 
+### removeRecovery()
+- **interface**: `api.tx.recovery.removeRecovery`
+- **summary**:   Remove the recovery process for your account. Recovered accounts are still accessible. 
+
+  NOTE: The user must make sure to call `close_recovery` on all active recovery attempts before calling this function else it will fail. 
+
+  Payment: By calling this function the recoverable account will unreserve their recovery configuration deposit. (`ConfigDepositBase` + `FriendDepositFactor` * #_of_friends) 
+
+  The dispatch origin for this call must be _Signed_ and must be a recoverable account (i.e. has a recovery configuration). 
+
+   
+ 
+### setRecovered(lost: `AccountId`, rescuer: `AccountId`)
+- **interface**: `api.tx.recovery.setRecovered`
+- **summary**:   Allow ROOT to bypass the recovery process and set an a rescuer account for a lost account directly. 
+
+  The dispatch origin for this call must be _ROOT_. 
+
+  Parameters: 
+
+  - `lost`: The "lost account" to be recovered.
+
+  - `rescuer`: The "rescuer account" which can call as the lost account.
+
+   
+ 
+### vouchRecovery(lost: `AccountId`, rescuer: `AccountId`)
+- **interface**: `api.tx.recovery.vouchRecovery`
+- **summary**:   Allow a "friend" of a recoverable account to vouch for an active recovery process for that account. 
+
+  The dispatch origin for this call must be _Signed_ and must be a "friend" for the recoverable account. 
+
+  Parameters: 
+
+  - `lost`: The lost account that you want to recover.
+
+  - `rescuer`: The account trying to rescue the lost account that you  want to vouch for. 
+
+  The combination of these two parameters must point to an active recovery process. 
+
+   
 
 ___
 
@@ -1164,6 +2019,185 @@ ___
 ___
 
 
+## society
+ 
+### bid(value: `BalanceOf`)
+- **interface**: `api.tx.society.bid`
+- **summary**:   A user outside of the society can make a bid for entry. 
+
+  Payment: `CandidateDeposit` will be reserved for making a bid. It is returned when the bid becomes a member, or if the bid calls `unbid`. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  Parameters: 
+
+  - `value`: A one time payment the bid would like to receive when joining the society.
+
+   
+ 
+### defenderVote(approve: `bool`)
+- **interface**: `api.tx.society.defenderVote`
+- **summary**:   As a member, vote on the defender. 
+
+  The dispatch origin for this call must be _Signed_ and a member. 
+
+  Parameters: 
+
+  - `approve`: A boolean which says if the candidate should beapproved (`true`) or rejected (`false`). 
+
+   
+ 
+### found(founder: `AccountId`, max_members: `u32`, rules: `Bytes`)
+- **interface**: `api.tx.society.found`
+- **summary**:   Found the society. 
+
+  This is done as a discrete action in order to allow for the module to be included into a running chain and can only be done once. 
+
+  The dispatch origin for this call must be from the _FounderSetOrigin_. 
+
+  Parameters: 
+
+  - `founder` - The first member and head of the newly founded society.
+
+  - `max_members` - The initial max number of members for the society.
+
+  - `rules` - The rules of this society concerning membership.
+
+   
+ 
+### judgeSuspendedCandidate(who: `AccountId`, judgement: `SocietyJudgement`)
+- **interface**: `api.tx.society.judgeSuspendedCandidate`
+- **summary**:   Allow suspended judgement origin to make judgement on a suspended candidate. 
+
+  If the judgement is `Approve`, we add them to society as a member with the appropriate payment for joining society. 
+
+  If the judgement is `Reject`, we either slash the deposit of the bid, giving it back to the society treasury, or we ban the voucher from vouching again. 
+
+  If the judgement is `Rebid`, we put the candidate back in the bid pool and let them go through the induction process again. 
+
+  The dispatch origin for this call must be from the _SuspensionJudgementOrigin_. 
+
+  Parameters: 
+
+  - `who` - The suspended candidate to be judged.
+
+  - `judgement` - `Approve`, `Reject`, or `Rebid`.
+
+   
+ 
+### judgeSuspendedMember(who: `AccountId`, forgive: `bool`)
+- **interface**: `api.tx.society.judgeSuspendedMember`
+- **summary**:   Allow suspension judgement origin to make judgement on a suspended member. 
+
+  If a suspended member is forgiven, we simply add them back as a member, not affecting any of the existing storage items for that member. 
+
+  If a suspended member is rejected, remove all associated storage items, including their payouts, and remove any vouched bids they currently have. 
+
+  The dispatch origin for this call must be from the _SuspensionJudgementOrigin_. 
+
+  Parameters: 
+
+  - `who` - The suspended member to be judged.
+
+  - `forgive` - A boolean representing whether the suspension judgement origin              forgives (`true`) or rejects (`false`) a suspended member. 
+
+   
+ 
+### payout()
+- **interface**: `api.tx.society.payout`
+- **summary**:   Transfer the first matured payout for the sender and remove it from the records. 
+
+  NOTE: This extrinsic needs to be called multiple times to claim multiple matured payouts. 
+
+  Payment: The member will receive a payment equal to their first matured payout to their free balance. 
+
+  The dispatch origin for this call must be _Signed_ and a member with payouts remaining. 
+
+   
+ 
+### setMaxMembers(max: `u32`)
+- **interface**: `api.tx.society.setMaxMembers`
+- **summary**:   Allows root origin to change the maximum number of members in society. Max membership count must be greater than 1. 
+
+  The dispatch origin for this call must be from _ROOT_. 
+
+  Parameters: 
+
+  - `max` - The maximum number of members for the society.
+
+   
+ 
+### unbid(pos: `u32`)
+- **interface**: `api.tx.society.unbid`
+- **summary**:   A bidder can remove their bid for entry into society. By doing so, they will have their candidate deposit returned or they will unvouch their voucher. 
+
+  Payment: The bid deposit is unreserved if the user made a bid. 
+
+  The dispatch origin for this call must be _Signed_ and a bidder. 
+
+  Parameters: 
+
+  - `pos`: Position in the `Bids` vector of the bid who wants to unbid.
+
+   
+ 
+### unfound()
+- **interface**: `api.tx.society.unfound`
+- **summary**:   Annul the founding of the society. 
+
+  The dispatch origin for this call must be Signed, and the signing account must be both the `Founder` and the `Head`. This implies that it may only be done when there is one member. 
+
+   
+ 
+### unvouch(pos: `u32`)
+- **interface**: `api.tx.society.unvouch`
+- **summary**:   As a vouching member, unvouch a bid. This only works while vouched user is only a bidder (and not a candidate). 
+
+  The dispatch origin for this call must be _Signed_ and a vouching member. 
+
+  Parameters: 
+
+  - `pos`: Position in the `Bids` vector of the bid who should be unvouched.
+
+   
+ 
+### vote(candidate: `LookupSource`, approve: `bool`)
+- **interface**: `api.tx.society.vote`
+- **summary**:   As a member, vote on a candidate. 
+
+  The dispatch origin for this call must be _Signed_ and a member. 
+
+  Parameters: 
+
+  - `candidate`: The candidate that the member would like to bid on.
+
+  - `approve`: A boolean which says if the candidate should be             approved (`true`) or rejected (`false`). 
+
+   
+ 
+### vouch(who: `AccountId`, value: `BalanceOf`, tip: `BalanceOf`)
+- **interface**: `api.tx.society.vouch`
+- **summary**:   As a member, vouch for someone to join society by placing a bid on their behalf. 
+
+  There is no deposit required to vouch for a new bid, but a member can only vouch for one bid at a time. If the bid becomes a suspended candidate and ultimately rejected by the suspension judgement origin, the member will be banned from vouching again. 
+
+  As a vouching member, you can claim a tip if the candidate is accepted. This tip will be paid as a portion of the reward the member will receive for joining the society. 
+
+  The dispatch origin for this call must be _Signed_ and a member. 
+
+  Parameters: 
+
+  - `who`: The user who you would like to vouch for.
+
+  - `value`: The total reward to be paid between you and the candidate if they becomea member in the society. 
+
+  - `tip`: Your cut of the total `value` payout when the candidate is inducted intothe society. Tips larger than `value` will be saturated upon payout. 
+
+   
+
+___
+
+
 ## staking
  
 ### bond(controller: `LookupSource`, value: `Compact<BalanceOf>`, payee: `RewardDestination`)
@@ -1202,21 +2236,11 @@ ___
  
 ### chill()
 - **interface**: `api.tx.staking.chill`
-- **summary**:   Declare no desire to either validate or guarantee. 
+- **summary**:   Declare no desire to either validate or nominate. 
 
   Effects will be felt at the beginning of the next era. 
 
-  The dispatch origin for this call must be _Signed_ by the controller, not the stash. 
-
-   
- 
-### cutGuarantee(target: `(LookupSource,BalanceOf)`)
-- **interface**: `api.tx.staking.cutGuarantee`
-- **summary**:   Declare the desire to cut guarantee for the origin controller. 
-
-  Effects will be felt at the beginning of the next era. 
-
-  The dispatch origin for this call must be _Signed_ by the controller, not the stash. 
+  The dispatch origin for this call must be _Signed_ by the controller, not the stash. And, it can be only called when [`EraElectionStatus`] is `Closed`. 
 
    
  
@@ -1244,19 +2268,11 @@ ___
 
    
  
-### forceUnstake(stash: `AccountId`)
+### forceUnstake(stash: `AccountId`, num_slashing_spans: `u32`)
 - **interface**: `api.tx.staking.forceUnstake`
 - **summary**:   Force a current staker to become completely unstaked, immediately. 
 
   The dispatch origin must be Root. 
-
-   
- 
-### guarantee(target: `(LookupSource,BalanceOf)`)
-- **interface**: `api.tx.staking.guarantee`
-- **summary**:   Declare the desire to guarantee `targets` for the origin controller. 
-
-  The dispatch origin for this call must be _Signed_ by the controller, not the stash. 
 
    
  
@@ -1268,9 +2284,45 @@ ___
 
    
  
-### reapStash(stash: `AccountId`)
+### kick(who: `Vec<LookupSource>`)
+- **interface**: `api.tx.staking.kick`
+- **summary**:   Remove the given nominations from the calling validator. 
+
+  Effects will be felt at the beginning of the next era. 
+
+  The dispatch origin for this call must be _Signed_ by the controller, not the stash. And, it can be only called when [`EraElectionStatus`] is `Closed`. The controller account should represent a validator. 
+
+  - `who`: A list of nominator stash accounts who are nominating this validator which   should no longer be nominating this validator. 
+
+  Note: Making this call only makes sense if you first set the validator preferences to block any further nominations. 
+ 
+### nominate(targets: `Vec<LookupSource>`)
+- **interface**: `api.tx.staking.nominate`
+- **summary**:   Declare the desire to nominate `targets` for the origin controller. 
+
+  Effects will be felt at the beginning of the next era. This can only be called when [`EraElectionStatus`] is `Closed`. 
+
+  The dispatch origin for this call must be _Signed_ by the controller, not the stash. And, it can be only called when [`EraElectionStatus`] is `Closed`. 
+
+   
+ 
+### payoutStakers(validator_stash: `AccountId`, era: `EraIndex`)
+- **interface**: `api.tx.staking.payoutStakers`
+- **summary**:   Pay out all the stakers behind a single validator for a single era. 
+
+  - `validator_stash` is the stash account of the validator. Their nominators, up to   `T::MaxNominatorRewardedPerValidator`, will also receive their rewards. 
+
+  - `era` may be any era between `[current_era - history_depth; current_era]`.
+
+  The origin of this call must be _Signed_. Any account can call this function, even if it is not one of the stakers. 
+
+  This can only be called when [`EraElectionStatus`] is `Closed`. 
+
+   
+ 
+### reapStash(stash: `AccountId`, num_slashing_spans: `u32`)
 - **interface**: `api.tx.staking.reapStash`
-- **summary**:   Remove all data structure concerning a staker/stash once its balance is zero. This is essentially equivalent to `withdraw_unbonded` except it can be called by anyone and the target `stash` must have no funds left. 
+- **summary**:   Remove all data structure concerning a staker/stash once its balance is at the minimum. This is essentially equivalent to `withdraw_unbonded` except it can be called by anyone and the target `stash` must have no funds left beyond the ED. 
 
   This can be called from any origin. 
 
@@ -1278,19 +2330,21 @@ ___
 
    
  
-### rechargeStakingPot(value: `Compact<BalanceOf>`)
-- **interface**: `api.tx.staking.rechargeStakingPot`
-- **summary**:   Recharge the staking pot 
+### rebond(value: `Compact<BalanceOf>`)
+- **interface**: `api.tx.staking.rebond`
+- **summary**:   Rebond a portion of the stash scheduled to be unlocked. 
+
+  The dispatch origin must be signed by the controller, and it can be only called when [`EraElectionStatus`] is `Closed`. 
+
+   
  
-### rewardStakers(validator_stash: `AccountId`, era: `EraIndex`)
-- **interface**: `api.tx.staking.rewardStakers`
-- **summary**:   Pay out all the stakers behind a single validator for a single era. 
+### scaleValidatorCount(factor: `Percent`)
+- **interface**: `api.tx.staking.scaleValidatorCount`
+- **summary**:   Scale up the ideal number of validators by a factor. 
 
-  - `validator_stash` is the stash account of the validator. Their guarantors, up to   `T::MaxGuarantorRewardedPerValidator`, will also receive their rewards. 
+  The dispatch origin must be Root. 
 
-  - `era` may be any era between `[current_era - history_depth; current_era]`.
-
-  The origin of this call must be _Signed_. Any account can call this function, even if it is not one of the stakers. TODO: Add weight for this one 
+   
  
 ### setController(controller: `LookupSource`)
 - **interface**: `api.tx.staking.setController`
@@ -1302,7 +2356,21 @@ ___
 
    
  
-### setInvulnerables(validators: `Vec<AccountId>`)
+### setHistoryDepth(new_history_depth: `Compact<EraIndex>`, _era_items_deleted: `Compact<u32>`)
+- **interface**: `api.tx.staking.setHistoryDepth`
+- **summary**:   Set `HistoryDepth` value. This function will delete any history information when `HistoryDepth` is reduced. 
+
+  Parameters: 
+
+  - `new_history_depth`: The new history depth you would like to set.
+
+  - `era_items_deleted`: The number of items that will be deleted by this dispatch.   This should report all the storage items that will be deleted by clearing old    era history. Needed to report an accurate weight for the dispatch. Trusted by    `Root` to report an accurate number. 
+
+  Origin must be root. 
+
+   
+ 
+### setInvulnerables(invulnerables: `Vec<AccountId>`)
 - **interface**: `api.tx.staking.setInvulnerables`
 - **summary**:   Set the validators who cannot be slashed (if any). 
 
@@ -1320,9 +2388,6 @@ ___
 
    
  
-### setStartRewardEra(start_reward_era: `EraIndex`)
-- **interface**: `api.tx.staking.setStartRewardEra`
- 
 ### setValidatorCount(new: `Compact<u32>`)
 - **interface**: `api.tx.staking.setValidatorCount`
 - **summary**:   Sets the ideal number of validators. 
@@ -1330,9 +2395,6 @@ ___
   The dispatch origin must be Root. 
 
    
- 
-### showPots()
-- **interface**: `api.tx.staking.showPots`
  
 ### unbond(value: `Compact<BalanceOf>`)
 - **interface**: `api.tx.staking.unbond`
@@ -1356,11 +2418,11 @@ ___
 
   Effects will be felt at the beginning of the next era. 
 
-  The dispatch origin for this call must be _Signed_ by the controller, not the stash. 
+  The dispatch origin for this call must be _Signed_ by the controller, not the stash. And, it can be only called when [`EraElectionStatus`] is `Closed`. 
 
    
  
-### withdrawUnbonded()
+### withdrawUnbonded(num_slashing_spans: `u32`)
 - **interface**: `api.tx.staking.withdrawUnbonded`
 - **summary**:   Remove any unlocked chunks from the `unlocking` queue from our management. 
 
@@ -1414,56 +2476,6 @@ ___
 ___
 
 
-## swork
- 
-### cancelPunishment(target: `LookupSource`)
-- **interface**: `api.tx.swork.cancelPunishment`
- 
-### createGroup()
-- **interface**: `api.tx.swork.createGroup`
- 
-### joinGroup(target: `LookupSource`)
-- **interface**: `api.tx.swork.joinGroup`
- 
-### kickOut(target: `LookupSource`)
-- **interface**: `api.tx.swork.kickOut`
- 
-### quitGroup()
-- **interface**: `api.tx.swork.quitGroup`
- 
-### register(ias_sig: `IASSig`, ias_cert: `SworkerCert`, applier: `AccountId`, isv_body: `ISVBody`, sig: `SworkerSignature`)
-- **interface**: `api.tx.swork.register`
-- **summary**:   Register as new trusted node, can only called from sWorker. All `inputs` can only be generated from sWorker's enclave 
-
-  The dispatch origin for this call must be _Signed_ by the reporter account. 
-
-  Emits `RegisterSuccess` if new id has been registered. 
-
-   
- 
-### reportWorks(curr_pk: `SworkerPubKey`, ab_upgrade_pk: `SworkerPubKey`, slot: `u64`, slot_hash: `Bytes`, reported_srd_size: `u64`, reported_files_size: `u64`, added_files: `Vec<(MerkleRoot,u64,u64)>`, deleted_files: `Vec<(MerkleRoot,u64,u64)>`, reported_srd_root: `MerkleRoot`, reported_files_root: `MerkleRoot`, sig: `SworkerSignature`)
-- **interface**: `api.tx.swork.reportWorks`
-- **summary**:   Report storage works from sWorker All `inputs` can only be generated from sWorker's enclave 
-
-  The dispatch origin for this call must be _Signed_ by the reporter account. 
-
-  Emits `WorksReportSuccess` if new work report has been reported 
-
-   
- 
-### setPunishment(is_enabled: `bool`)
-- **interface**: `api.tx.swork.setPunishment`
-- **summary**:   Set the punishment flag 
- 
-### upgrade(new_code: `SworkerCode`, expire_block: `BlockNumber`)
-- **interface**: `api.tx.swork.upgrade`
-- **summary**:   AB Upgrade, this should only be called by `root` origin Ruled by `sudo/democracy` 
-
-   
-
-___
-
-
 ## system
  
 ### fillBlock(_ratio: `Perbill`)
@@ -1487,6 +2499,12 @@ ___
 ### remark(_remark: `Bytes`)
 - **interface**: `api.tx.system.remark`
 - **summary**:   Make some on-chain remark. 
+
+   
+ 
+### remarkWithEvent(remark: `Bytes`)
+- **interface**: `api.tx.system.remarkWithEvent`
+- **summary**:   Make some on-chain remark and emit event. 
 
    
  
@@ -1517,12 +2535,6 @@ ___
 ### setStorage(items: `Vec<KeyValue>`)
 - **interface**: `api.tx.system.setStorage`
 - **summary**:   Set some items of storage. 
-
-   
- 
-### suicide()
-- **interface**: `api.tx.system.suicide`
-- **summary**:   Kill the sending account, assuming there are no references outstanding and the composite data is equal to its default value. 
 
    
 
@@ -1716,6 +2728,18 @@ ___
 
    
  
+### slashTip(hash: `Hash`)
+- **interface**: `api.tx.tips.slashTip`
+- **summary**:   Remove and slash an already-open tip. 
+
+  May only be called from `T::RejectOrigin`. 
+
+  As a result, the finder is slashed and the deposits are lost. 
+
+  Emits `TipSlashed` if successful. 
+
+   
+ 
 ### tip(hash: `Hash`, tip_value: `Compact<BalanceOf>`)
 - **interface**: `api.tx.tips.tip`
 - **summary**:   Declare a tip value for an already-open tip. 
@@ -1813,5 +2837,66 @@ ___
   - `calls`: The calls to be dispatched from the same origin. 
 
   If origin is root then call are dispatch without checking origin filter. (This includes bypassing `frame_system::Config::BaseCallFilter`). 
+
+   
+
+___
+
+
+## vesting
+ 
+### forceVestedTransfer(source: `LookupSource`, target: `LookupSource`, schedule: `VestingInfo`)
+- **interface**: `api.tx.vesting.forceVestedTransfer`
+- **summary**:   Force a vested transfer. 
+
+  The dispatch origin for this call must be _Root_. 
+
+  - `source`: The account whose funds should be transferred. 
+
+  - `target`: The account that should be transferred the vested funds.
+
+  - `amount`: The amount of funds to transfer and will be vested.
+
+  - `schedule`: The vesting schedule attached to the transfer.
+
+  Emits `VestingCreated`. 
+
+   
+ 
+### vest()
+- **interface**: `api.tx.vesting.vest`
+- **summary**:   Unlock any vested funds of the sender account. 
+
+  The dispatch origin for this call must be _Signed_ and the sender must have funds still locked under this pallet. 
+
+  Emits either `VestingCompleted` or `VestingUpdated`. 
+
+   
+ 
+### vestOther(target: `LookupSource`)
+- **interface**: `api.tx.vesting.vestOther`
+- **summary**:   Unlock any vested funds of a `target` account. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  - `target`: The account whose vested funds should be unlocked. Must have funds still locked under this pallet. 
+
+  Emits either `VestingCompleted` or `VestingUpdated`. 
+
+   
+ 
+### vestedTransfer(target: `LookupSource`, schedule: `VestingInfo`)
+- **interface**: `api.tx.vesting.vestedTransfer`
+- **summary**:   Create a vested transfer. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  - `target`: The account that should be transferred the vested funds. 
+
+  - `amount`: The amount of funds to transfer and will be vested.
+
+  - `schedule`: The vesting schedule attached to the transfer.
+
+  Emits `VestingCreated`. 
 
    

@@ -12,21 +12,31 @@ The following sections contain the module constants, also known as parameter typ
 
 - **[bounties](#bounties)**
 
-- **[claims](#claims)**
+- **[contracts](#contracts)**
 
 - **[democracy](#democracy)**
 
+- **[electionProviderMultiPhase](#electionprovidermultiphase)**
+
 - **[elections](#elections)**
+
+- **[gilt](#gilt)**
 
 - **[identity](#identity)**
 
 - **[indices](#indices)**
 
-- **[market](#market)**
+- **[lottery](#lottery)**
+
+- **[multisig](#multisig)**
+
+- **[proxy](#proxy)**
+
+- **[recovery](#recovery)**
+
+- **[society](#society)**
 
 - **[staking](#staking)**
-
-- **[swork](#swork)**
 
 - **[system](#system)**
 
@@ -38,6 +48,8 @@ The following sections contain the module constants, also known as parameter typ
 
 - **[treasury](#treasury)**
 
+- **[vesting](#vesting)**
+
 
 ___
 
@@ -46,7 +58,7 @@ ___
  
 ### epochDuration: `u64`
 - **interface**: `api.consts.babe.epochDuration`
-- **summary**:   The number of **slots** that an epoch takes. We couple sessions to epochs, i.e. we start a new session once the new epoch begins. 
+- **summary**:   The amount of time, in slots, that each epoch should last. NOTE: Currently it is not possible to change the epoch duration after the chain has started. Attempting to do so will brick block production. 
  
 ### expectedBlockTime: `Moment`
 - **interface**: `api.consts.babe.expectedBlockTime`
@@ -78,6 +90,10 @@ ___
 - **interface**: `api.consts.bounties.bountyDepositPayoutDelay`
 - **summary**:   The delay period for which a bounty beneficiary need to wait before claim the payout. 
  
+### bountyUpdatePeriod: `BlockNumber`
+- **interface**: `api.consts.bounties.bountyUpdatePeriod`
+- **summary**:   Bounty duration in blocks. 
+ 
 ### bountyValueMinimum: `BalanceOf`
 - **interface**: `api.consts.bounties.bountyValueMinimum`
 - **summary**:   Minimum value for a bounty. 
@@ -93,11 +109,67 @@ ___
 ___
 
 
-## claims
+## contracts
  
-### prefix: `Bytes`
-- **interface**: `api.consts.claims.prefix`
-- **summary**:   The Prefix that is used in signed Ethereum messages for this network 
+### deletionQueueDepth: `u32`
+- **interface**: `api.consts.contracts.deletionQueueDepth`
+- **summary**:   The maximum number of tries that can be queued for deletion. 
+ 
+### deletionWeightLimit: `Weight`
+- **interface**: `api.consts.contracts.deletionWeightLimit`
+- **summary**:   The maximum amount of weight that can be consumed per block for lazy trie removal. 
+ 
+### depositPerContract: `BalanceOf`
+- **interface**: `api.consts.contracts.depositPerContract`
+- **summary**:   The balance every contract needs to deposit to stay alive indefinitely. 
+
+  This is different from the [`Self::TombstoneDeposit`] because this only needs to be deposited while the contract is alive. Costs for additional storage are added to this base cost. 
+
+  This is a simple way to ensure that contracts with empty storage eventually get deleted by making them pay rent. This creates an incentive to remove them early in order to save rent. 
+ 
+### depositPerStorageByte: `BalanceOf`
+- **interface**: `api.consts.contracts.depositPerStorageByte`
+- **summary**:   The balance a contract needs to deposit per storage byte to stay alive indefinitely. 
+
+  Let's suppose the deposit is 1,000 BU (balance units)/byte and the rent is 1 BU/byte/day, then a contract with 1,000,000 BU that uses 1,000 bytes of storage would pay no rent. But if the balance reduced to 500,000 BU and the storage stayed the same at 1,000, then it would pay 500 BU/day. 
+ 
+### depositPerStorageItem: `BalanceOf`
+- **interface**: `api.consts.contracts.depositPerStorageItem`
+- **summary**:   The balance a contract needs to deposit per storage item to stay alive indefinitely. 
+
+  It works the same as [`Self::DepositPerStorageByte`] but for storage items. 
+ 
+### maxCodeSize: `u32`
+- **interface**: `api.consts.contracts.maxCodeSize`
+- **summary**:   The maximum length of a contract code in bytes. This limit applies to the instrumented version of the code. Therefore `instantiate_with_code` can fail even when supplying a wasm binary below this maximum size. 
+ 
+### maxDepth: `u32`
+- **interface**: `api.consts.contracts.maxDepth`
+- **summary**:   The maximum nesting level of a call/instantiate stack. 
+ 
+### maxValueSize: `u32`
+- **interface**: `api.consts.contracts.maxValueSize`
+- **summary**:   The maximum size of a storage value and event payload in bytes. 
+ 
+### rentFraction: `Perbill`
+- **interface**: `api.consts.contracts.rentFraction`
+- **summary**:   The fraction of the deposit that should be used as rent per block. 
+
+  When a contract hasn't enough balance deposited to stay alive indefinitely it needs to pay per block for the storage it consumes that is not covered by the deposit. This determines how high this rent payment is per block as a fraction of the deposit. 
+ 
+### signedClaimHandicap: `BlockNumber`
+- **interface**: `api.consts.contracts.signedClaimHandicap`
+- **summary**:   Number of block delay an extrinsic claim surcharge has. 
+
+  When claim surcharge is called by an extrinsic the rent is checked for current_block - delay 
+ 
+### surchargeReward: `BalanceOf`
+- **interface**: `api.consts.contracts.surchargeReward`
+- **summary**:   Reward that is received by the party whose touch has led to removal of a contract. 
+ 
+### tombstoneDeposit: `BalanceOf`
+- **interface**: `api.consts.contracts.tombstoneDeposit`
+- **summary**:   The minimum amount required to generate a tombstone. 
 
 ___
 
@@ -141,6 +213,23 @@ ___
 ___
 
 
+## electionProviderMultiPhase
+ 
+### signedPhase: `BlockNumber`
+- **interface**: `api.consts.electionProviderMultiPhase.signedPhase`
+- **summary**:   Duration of the signed phase. 
+ 
+### solutionImprovementThreshold: `Perbill`
+- **interface**: `api.consts.electionProviderMultiPhase.solutionImprovementThreshold`
+- **summary**:   The minimum amount of improvement to the solution score that defines a solution as "better" (in any phase). 
+ 
+### unsignedPhase: `BlockNumber`
+- **interface**: `api.consts.electionProviderMultiPhase.unsignedPhase`
+- **summary**:   Duration of the unsigned phase. 
+
+___
+
+
 ## elections
  
 ### candidacyBond: `BalanceOf`
@@ -152,14 +241,56 @@ ___
 ### desiredRunnersUp: `u32`
 - **interface**: `api.consts.elections.desiredRunnersUp`
  
-### moduleId: `LockIdentifier`
-- **interface**: `api.consts.elections.moduleId`
+### palletId: `LockIdentifier`
+- **interface**: `api.consts.elections.palletId`
  
 ### termDuration: `BlockNumber`
 - **interface**: `api.consts.elections.termDuration`
  
-### votingBond: `BalanceOf`
-- **interface**: `api.consts.elections.votingBond`
+### votingBondBase: `BalanceOf`
+- **interface**: `api.consts.elections.votingBondBase`
+ 
+### votingBondFactor: `BalanceOf`
+- **interface**: `api.consts.elections.votingBondFactor`
+
+___
+
+
+## gilt
+ 
+### fifoQueueLen: `u32`
+- **interface**: `api.consts.gilt.fifoQueueLen`
+- **summary**:   Portion of the queue which is free from ordering and just a FIFO. 
+
+  Must be no greater than `MaxQueueLen`. 
+ 
+### intakePeriod: `BlockNumber`
+- **interface**: `api.consts.gilt.intakePeriod`
+- **summary**:   The number of blocks between consecutive attempts to issue more gilts in an effort to get to the target amount to be frozen. 
+
+  A larger value results in fewer storage hits each block, but a slower period to get to the target. 
+ 
+### maxIntakeBids: `u32`
+- **interface**: `api.consts.gilt.maxIntakeBids`
+- **summary**:   The maximum amount of bids that can be turned into issued gilts each block. A larger value here means less of the block available for transactions should there be a glut of bids to make into gilts to reach the target. 
+ 
+### maxQueueLen: `u32`
+- **interface**: `api.consts.gilt.maxQueueLen`
+- **summary**:   Maximum number of items that may be in each duration queue. 
+ 
+### minFreeze: `BalanceOf`
+- **interface**: `api.consts.gilt.minFreeze`
+- **summary**:   The minimum amount of funds that may be offered to freeze for a gilt. Note that this does not actually limit the amount which may be frozen in a gilt since gilts may be split up in order to satisfy the desired amount of funds under gilts. 
+
+  It should be at least big enough to ensure that there is no possible storage spam attack or queue-filling attack. 
+ 
+### period: `BlockNumber`
+- **interface**: `api.consts.gilt.period`
+- **summary**:   The base period for the duration queues. This is the common multiple across all supported freezing durations that can be bid upon. 
+ 
+### queueCount: `u32`
+- **interface**: `api.consts.gilt.queueCount`
+- **summary**:   Number of duration queues in total. This sets the maximum duration supported, which is this value multiplied by `Period`. 
 
 ___
 
@@ -202,86 +333,144 @@ ___
 ___
 
 
-## market
+## lottery
  
-### fileBaseFee: `BalanceOf`
-- **interface**: `api.consts.market.fileBaseFee`
-- **summary**:   File Base Fee. 
+### maxCalls: `u32`
+- **interface**: `api.consts.lottery.maxCalls`
  
-### fileDuration: `BlockNumber`
-- **interface**: `api.consts.market.fileDuration`
-- **summary**:   File duration. 
+### palletId: `PalletId`
+- **interface**: `api.consts.lottery.palletId`
+
+___
+
+
+## multisig
  
-### fileInitPrice: `BalanceOf`
-- **interface**: `api.consts.market.fileInitPrice`
-- **summary**:   File Init Price. 
+### depositBase: `BalanceOf`
+- **interface**: `api.consts.multisig.depositBase`
+- **summary**:   The base amount of currency needed to reserve for creating a multisig execution or to store a dispatch call for later. 
  
-### fileReplica: `u32`
-- **interface**: `api.consts.market.fileReplica`
-- **summary**:   File base replica. 
+### depositFactor: `BalanceOf`
+- **interface**: `api.consts.multisig.depositFactor`
+- **summary**:   The amount of currency needed per unit threshold when creating a multisig execution. 
  
-### maximumFileSize: `u64`
-- **interface**: `api.consts.market.maximumFileSize`
-- **summary**:   Max size of a file 
+### maxSignatories: `u16`
+- **interface**: `api.consts.multisig.maxSignatories`
+- **summary**:   The maximum amount of signatories allowed for a given multisig. 
+
+___
+
+
+## proxy
  
-### moduleId: `ModuleId`
-- **interface**: `api.consts.market.moduleId`
-- **summary**:   The market's module id, used for deriving its sovereign account ID. 
+### announcementDepositBase: `BalanceOf`
+- **interface**: `api.consts.proxy.announcementDepositBase`
+- **summary**:   The base amount of currency needed to reserve for creating an announcement. 
+
+  This is held when a new storage item holding a `Balance` is created (typically 16 bytes). 
  
-### renewRewardRatio: `Perbill`
-- **interface**: `api.consts.market.renewRewardRatio`
-- **summary**:   Renew reward ratio. 
+### announcementDepositFactor: `BalanceOf`
+- **interface**: `api.consts.proxy.announcementDepositFactor`
+- **summary**:   The amount of currency needed per announcement made. 
+
+  This is held for adding an `AccountId`, `Hash` and `BlockNumber` (typically 68 bytes) into a pre-existing storage value. 
  
-### stakingRatio: `Perbill`
-- **interface**: `api.consts.market.stakingRatio`
-- **summary**:   Storage / Staking ratio. 
+### maxPending: `u32`
+- **interface**: `api.consts.proxy.maxPending`
+- **summary**:   The maximum amount of time-delayed announcements that are allowed to be pending. 
  
-### storageDecreaseRatio: `Perbill`
-- **interface**: `api.consts.market.storageDecreaseRatio`
-- **summary**:   Storage decrease ratio. 
+### maxProxies: `u16`
+- **interface**: `api.consts.proxy.maxProxies`
+- **summary**:   The maximum amount of proxies allowed for a single account. 
  
-### storageIncreaseRatio: `Perbill`
-- **interface**: `api.consts.market.storageIncreaseRatio`
-- **summary**:   Storage increase ratio. 
+### proxyDepositBase: `BalanceOf`
+- **interface**: `api.consts.proxy.proxyDepositBase`
+- **summary**:   The base amount of currency needed to reserve for creating a proxy. 
+
+  This is held for an additional storage item whose value size is `sizeof(Balance)` bytes and whose key size is `sizeof(AccountId)` bytes. 
  
-### storageReferenceRatio: `(u128,u128)`
-- **interface**: `api.consts.market.storageReferenceRatio`
-- **summary**:   Storage reference ratio. files_size / total_capacity 
+### proxyDepositFactor: `BalanceOf`
+- **interface**: `api.consts.proxy.proxyDepositFactor`
+- **summary**:   The amount of currency needed per proxy added. 
+
+  This is held for adding 32 bytes plus an instance of `ProxyType` more into a pre-existing storage value. Thus, when configuring `ProxyDepositFactor` one should take into account `32 + proxy_type.encode().len()` bytes of data. 
+
+___
+
+
+## recovery
  
-### taxRatio: `Perbill`
-- **interface**: `api.consts.market.taxRatio`
-- **summary**:   Tax / Storage plus Staking ratio. 
+### configDepositBase: `BalanceOf`
+- **interface**: `api.consts.recovery.configDepositBase`
+- **summary**:   The base amount of currency needed to reserve for creating a recovery configuration. 
  
-### usedTrashMaxSize: `u128`
-- **interface**: `api.consts.market.usedTrashMaxSize`
-- **summary**:   Max size of used trash. 
+### friendDepositFactor: `BalanceOf`
+- **interface**: `api.consts.recovery.friendDepositFactor`
+- **summary**:   The amount of currency needed per additional user when creating a recovery configuration. 
+ 
+### maxFriends: `u16`
+- **interface**: `api.consts.recovery.maxFriends`
+- **summary**:   The maximum amount of friends allowed in a recovery configuration. 
+ 
+### recoveryDeposit: `BalanceOf`
+- **interface**: `api.consts.recovery.recoveryDeposit`
+- **summary**:   The base amount of currency needed to reserve for starting a recovery. 
+
+___
+
+
+## society
+ 
+### candidateDeposit: `BalanceOf`
+- **interface**: `api.consts.society.candidateDeposit`
+- **summary**:   The minimum amount of a deposit required for a bid to be made. 
+ 
+### challengePeriod: `BlockNumber`
+- **interface**: `api.consts.society.challengePeriod`
+- **summary**:   The number of blocks between membership challenges. 
+ 
+### maxCandidateIntake: `u32`
+- **interface**: `api.consts.society.maxCandidateIntake`
+- **summary**:   Maximum candidate intake per round. 
+ 
+### maxStrikes: `u32`
+- **interface**: `api.consts.society.maxStrikes`
+- **summary**:   The number of times a member may vote the wrong way (or not at all, when they are a skeptic) before they become suspended. 
+ 
+### palletId: `PalletId`
+- **interface**: `api.consts.society.palletId`
+- **summary**:   The societies's module id 
+ 
+### periodSpend: `BalanceOf`
+- **interface**: `api.consts.society.periodSpend`
+- **summary**:   The amount of incentive paid within each period. Doesn't include VoterTip. 
+ 
+### rotationPeriod: `BlockNumber`
+- **interface**: `api.consts.society.rotationPeriod`
+- **summary**:   The number of blocks between candidate/membership rotation periods. 
+ 
+### wrongSideDeduction: `BalanceOf`
+- **interface**: `api.consts.society.wrongSideDeduction`
+- **summary**:   The amount of the unpaid reward that gets deducted in the case that either a skeptic doesn't vote or someone votes in the wrong way. 
 
 ___
 
 
 ## staking
  
-### authoringAndStakingRatio: `Perbill`
-- **interface**: `api.consts.staking.authoringAndStakingRatio`
-- **summary**:   Authoring and Staking ratio for market staking pot 
- 
 ### bondingDuration: `EraIndex`
 - **interface**: `api.consts.staking.bondingDuration`
 - **summary**:   Number of eras that staked funds must remain bonded for. 
  
-### marketStakingPotDuration: `u32`
-- **interface**: `api.consts.staking.marketStakingPotDuration`
-- **summary**:   Total era duration for once dsm staking pot. 
+### maxNominations: `u32`
+- **interface**: `api.consts.staking.maxNominations`
+- **summary**:   Maximum number of nominations per nominator. 
  
-### maxGuarantorRewardedPerValidator: `u32`
-- **interface**: `api.consts.staking.maxGuarantorRewardedPerValidator`
-- **summary**:   The maximum number of guarantors rewarded for each validator. 
+### maxNominatorRewardedPerValidator: `u32`
+- **interface**: `api.consts.staking.maxNominatorRewardedPerValidator`
+- **summary**:   The maximum number of nominators rewarded for each validator. 
 
-  For each validator only the `$MaxGuarantorRewardedPerValidator` biggest stakers can claim their reward. This used to limit the i/o cost for the guarantor payout. 
- 
-### moduleId: `ModuleId`
-- **interface**: `api.consts.staking.moduleId`
-- **summary**:   The staking's module id, used for deriving its sovereign account ID. 
+  For each validator only the `$MaxNominatorRewardedPerValidator` biggest stakers can claim their reward. This used to limit the i/o cost for the nominator payout. 
  
 ### sessionsPerEra: `SessionIndex`
 - **interface**: `api.consts.staking.sessionsPerEra`
@@ -292,23 +481,6 @@ ___
 - **summary**:   Number of eras that slashes are deferred by, after computation. 
 
   This should be less than the bonding duration. Set to 0 if slashes should be applied immediately, without opportunity for intervention. 
- 
-### sPowerRatio: `u128`
-- **interface**: `api.consts.staking.sPowerRatio`
-- **summary**:   Storage power ratio for crust network phase 1 
-
-___
-
-
-## swork
- 
-### maxGroupSize: `u32`
-- **interface**: `api.consts.swork.maxGroupSize`
-- **summary**:   Max number of members in one group 
- 
-### punishmentSlots: `u32`
-- **interface**: `api.consts.swork.punishmentSlots`
-- **summary**:   Punishment duration if someone offline 
 
 ___
 
@@ -317,15 +489,29 @@ ___
  
 ### blockHashCount: `BlockNumber`
 - **interface**: `api.consts.system.blockHashCount`
-- **summary**:   The maximum number of blocks to allow in mortal eras. 
+- **summary**:   Maximum number of block number to block hash mappings to keep (oldest pruned first). 
+ 
+### blockLength: `BlockLength`
+- **interface**: `api.consts.system.blockLength`
+- **summary**:   The maximum length of a block (in bytes). 
  
 ### blockWeights: `BlockWeights`
 - **interface**: `api.consts.system.blockWeights`
-- **summary**:   The weight configuration (limits & base values) for each class of extrinsics and block. 
+- **summary**:   Block & extrinsics weights: base values and limits. 
  
 ### dbWeight: `RuntimeDbWeight`
 - **interface**: `api.consts.system.dbWeight`
 - **summary**:   The weight of runtime database operations the runtime can invoke. 
+ 
+### ss58Prefix: `u8`
+- **interface**: `api.consts.system.ss58Prefix`
+- **summary**:   The designated SS85 prefix of this chain. 
+
+  This replaces the "ss58Format" property declared in the chain spec. Reason is that the runtime should know about the prefix in order to make use of it as an identifier of the chain. 
+ 
+### version: `RuntimeVersion`
+- **interface**: `api.consts.system.version`
+- **summary**:   Get the chain's current version. 
 
 ___
 
@@ -383,8 +569,8 @@ ___
 - **interface**: `api.consts.treasury.burn`
 - **summary**:   Percentage of spare funds (if any) that are burnt per spend period. 
  
-### moduleId: `ModuleId`
-- **interface**: `api.consts.treasury.moduleId`
+### palletId: `PalletId`
+- **interface**: `api.consts.treasury.palletId`
 - **summary**:   The treasury's module id, used for deriving its sovereign account ID. 
  
 ### proposalBond: `Permill`
@@ -398,3 +584,12 @@ ___
 ### spendPeriod: `BlockNumber`
 - **interface**: `api.consts.treasury.spendPeriod`
 - **summary**:   Period between successive spends. 
+
+___
+
+
+## vesting
+ 
+### minVestedTransfer: `BalanceOf`
+- **interface**: `api.consts.vesting.minVestedTransfer`
+- **summary**:   The minimum amount transferred to call `vested_transfer`. 
