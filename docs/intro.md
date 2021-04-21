@@ -14,7 +14,7 @@ If you are a end-user looking to interact with the network, you can interact wit
 
 ## Help us help others
 
-If you spot gaps in the information provided, or are uncertain about any specific area, please do [log an issue](https://github.com/crustio/docs-1/issues) or if you are that way inclined, make a pull-request. We really want to have good documentation in these areas and allow people to be productive right from the start.
+If you spot gaps in the information provided, or are uncertain about any specific area, please do [log an issue](https://github.com/crustio/docs/issues) or if you are that way inclined, make a pull-request. We really want to have good documentation in these areas and allow people to be productive right from the start.
 
 
 ## Contributing
