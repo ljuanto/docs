@@ -6,8 +6,6 @@ The following sections contain Storage methods are part of the default Substrate
 
 (NOTE: These were generated from a static/snapshot view of a recent Substrate master node. Some items may not be available in older nodes, or in any customized implementations.)
 
-- **[assets](#assets)**
-
 - **[authorship](#authorship)**
 
 - **[babe](#babe)**
@@ -16,17 +14,15 @@ The following sections contain Storage methods are part of the default Substrate
 
 - **[bounties](#bounties)**
 
-- **[contracts](#contracts)**
+- **[candy](#candy)**
+
+- **[claims](#claims)**
 
 - **[council](#council)**
 
 - **[democracy](#democracy)**
 
-- **[electionProviderMultiPhase](#electionprovidermultiphase)**
-
 - **[elections](#elections)**
-
-- **[gilt](#gilt)**
 
 - **[grandpa](#grandpa)**
 
@@ -36,29 +32,21 @@ The following sections contain Storage methods are part of the default Substrate
 
 - **[indices](#indices)**
 
-- **[lottery](#lottery)**
-
-- **[mmr](#mmr)**
-
-- **[multisig](#multisig)**
+- **[market](#market)**
 
 - **[offences](#offences)**
 
-- **[proxy](#proxy)**
-
 - **[randomnessCollectiveFlip](#randomnesscollectiveflip)**
-
-- **[recovery](#recovery)**
 
 - **[scheduler](#scheduler)**
 
 - **[session](#session)**
 
-- **[society](#society)**
-
 - **[staking](#staking)**
 
 - **[sudo](#sudo)**
+
+- **[swork](#swork)**
 
 - **[system](#system)**
 
@@ -74,31 +62,8 @@ The following sections contain Storage methods are part of the default Substrate
 
 - **[treasury](#treasury)**
 
-- **[vesting](#vesting)**
-
 - **[substrate](#substrate)**
 
-
-___
-
-
-## assets
- 
-### account(`AssetId, AccountId`): `AssetBalance`
-- **interface**: `api.query.assets.account`
-- **summary**:   The number of units of assets held by any given account. 
- 
-### approvals(`AssetId, AssetApprovalKey`): `Option<AssetApproval>`
-- **interface**: `api.query.assets.approvals`
-- **summary**:   Approved balance transfers. First balance is the amount approved for transfer. Second is the amount of `T::Currency` reserved for storing this. 
- 
-### asset(`AssetId`): `Option<AssetDetails>`
-- **interface**: `api.query.assets.asset`
-- **summary**:   Details of an asset. 
- 
-### metadata(`AssetId`): `AssetMetadata`
-- **interface**: `api.query.assets.metadata`
-- **summary**:   Metadata of an asset. 
 
 ___
 
@@ -130,23 +95,15 @@ ___
 - **interface**: `api.query.babe.authorVrfRandomness`
 - **summary**:   Temporary value (cleared at block finalization) that includes the VRF output generated at this block. This field should always be populated during block processing unless secondary plain slots are enabled (which don't contain a VRF output). 
  
-### currentSlot(): `Slot`
+### currentSlot(): `u64`
 - **interface**: `api.query.babe.currentSlot`
 - **summary**:   Current slot number. 
- 
-### epochConfig(): `Option<BabeEpochConfiguration>`
-- **interface**: `api.query.babe.epochConfig`
-- **summary**:   The configuration for the current epoch. Should never be `None` as it is initialized in genesis. 
  
 ### epochIndex(): `u64`
 - **interface**: `api.query.babe.epochIndex`
 - **summary**:   Current epoch index. 
  
-### epochStart(): `(BlockNumber,BlockNumber)`
-- **interface**: `api.query.babe.epochStart`
-- **summary**:   The block numbers when the last and current epoch have started, respectively `N-1` and `N`. NOTE: We track this is in order to annotate the block number when a given pool of entropy was fixed (i.e. it was known to chain observers). Since epochs are defined in slots, which may be skipped, the block numbers may not line up with the slot numbers. 
- 
-### genesisSlot(): `Slot`
+### genesisSlot(): `u64`
 - **interface**: `api.query.babe.genesisSlot`
 - **summary**:   The slot at which the first epoch actually started. This is 0 until the first block of the chain. 
  
@@ -160,21 +117,13 @@ ___
 
   This entry is populated as part of block execution and is cleaned up on block finalization. Querying this storage entry outside of block execution context should always yield zero. 
  
-### nextAuthorities(): `Vec<(AuthorityId,BabeAuthorityWeight)>`
-- **interface**: `api.query.babe.nextAuthorities`
-- **summary**:   Next epoch authorities. 
- 
-### nextEpochConfig(): `Option<BabeEpochConfiguration>`
+### nextEpochConfig(): `Option<NextConfigDescriptor>`
 - **interface**: `api.query.babe.nextEpochConfig`
-- **summary**:   The configuration for the next epoch, `None` if the config will not change (you can fallback to `EpochConfig` instead in that case). 
+- **summary**:   Next epoch configuration, if changed. 
  
 ### nextRandomness(): `Randomness`
 - **interface**: `api.query.babe.nextRandomness`
 - **summary**:   Next epoch randomness. 
- 
-### pendingEpochConfigChange(): `Option<NextConfigDescriptor>`
-- **interface**: `api.query.babe.pendingEpochConfigChange`
-- **summary**:   Pending epoch configuration change that will be applied when the next epoch is enacted. 
  
 ### randomness(): `Randomness`
 - **interface**: `api.query.babe.randomness`
@@ -205,7 +154,7 @@ ___
 - **interface**: `api.query.balances.account`
 - **summary**:   The balance of an account. 
 
-  NOTE: This is only used in the case that this pallet is used to store balances. 
+  NOTE: This is only used in the case that this module is used to store balances. 
  
 ### locks(`AccountId`): `Vec<BalanceLock>`
 - **interface**: `api.query.balances.locks`
@@ -245,35 +194,63 @@ ___
 ___
 
 
-## contracts
+## candy
  
-### accountCounter(): `u64`
-- **interface**: `api.query.contracts.accountCounter`
-- **summary**:   The subtrie counter. 
+### balances(`AccountId`): `Balance`
+- **interface**: `api.query.candy.balances`
+- **summary**:   The number of units of candy held by any given account. 
  
-### codeStorage(`CodeHash`): `Option<PrefabWasmModule>`
-- **interface**: `api.query.contracts.codeStorage`
-- **summary**:   A mapping between an original code hash and instrumented wasm code, ready for execution. 
- 
-### contractInfoOf(`AccountId`): `Option<ContractInfo>`
-- **interface**: `api.query.contracts.contractInfoOf`
-- **summary**:   The code associated with a given account. 
+### total(): `Balance`
+- **interface**: `api.query.candy.total`
+- **summary**:   The total unit supply of candy. 
 
-  TWOX-NOTE: SAFE since `AccountId` is a secure hash. 
- 
-### currentSchedule(): `Schedule`
-- **interface**: `api.query.contracts.currentSchedule`
-- **summary**:   Current cost schedule for contracts. 
- 
-### deletionQueue(): `Vec<DeletedContract>`
-- **interface**: `api.query.contracts.deletionQueue`
-- **summary**:   Evicted contracts that await child trie deletion. 
+___
 
-  Child trie deletion is a heavy operation depending on the amount of storage items stored in said trie. Therefore this operation is performed lazily in `on_initialize`. 
+
+## claims
  
-### pristineCode(`CodeHash`): `Option<Bytes>`
-- **interface**: `api.query.contracts.pristineCode`
-- **summary**:   A mapping from an original code hash to the original code, untouched by instrumentation. 
+### bondedEth(`AccountId`): `Option<EthereumAddress>`
+- **interface**: `api.query.claims.bondedEth`
+ 
+### claimed(`EthereumTxHash`): `bool`
+- **interface**: `api.query.claims.claimed`
+- **summary**:   If `Claims(EthereumTxHash)` already been claimed, prevent double claim. 
+ 
+### claimLimit(): `BalanceOf`
+- **interface**: `api.query.claims.claimLimit`
+- **summary**:   Claim limit deciding how much CRUPV can be mint. 
+ 
+### claims(`EthereumTxHash`): `Option<(EthereumAddress,BalanceOf)>`
+- **interface**: `api.query.claims.claims`
+- **summary**:   Mapping with [EthereumTxHash: (EthereumAddress, TokenAmount)], mining by `Miner`. 
+ 
+### cru18Claimed(`EthereumAddress`): `bool`
+- **interface**: `api.query.claims.cru18Claimed`
+- **summary**:   If `Cru18Tokens(EthereumAddress)` already been claimed, prevent double claim. 
+ 
+### cru18Claims(`EthereumAddress, AccountId`): `Option<BalanceOf>`
+- **interface**: `api.query.claims.cru18Claims`
+- **summary**:   CRU18 claims information with [EthereumAddress, Cru18PubKey]. 
+ 
+### cru18Miner(): `Option<AccountId>`
+- **interface**: `api.query.claims.cru18Miner`
+- **summary**:   Cru18 miner set by sudo. 
+ 
+### cru18PreClaims(`EthereumAddress`): `Option<BalanceOf>`
+- **interface**: `api.query.claims.cru18PreClaims`
+- **summary**:   ERC20 CRU18 locked tokens, to be claimed information. 
+ 
+### cru18TotalClaimed(): `BalanceOf`
+- **interface**: `api.query.claims.cru18TotalClaimed`
+- **summary**:   Claimed CRU18 locked tokens. 
+ 
+### miner(): `Option<AccountId>`
+- **interface**: `api.query.claims.miner`
+- **summary**:   Maxwell miner set by sudo. 
+ 
+### superior(): `Option<AccountId>`
+- **interface**: `api.query.claims.superior`
+- **summary**:   Controlling the CRUPV claim limit, set by sudo. 
 
 ___
 
@@ -382,99 +359,29 @@ ___
 ___
 
 
-## electionProviderMultiPhase
- 
-### currentPhase(): `ElectionPhase`
-- **interface**: `api.query.electionProviderMultiPhase.currentPhase`
-- **summary**:   Current phase. 
- 
-### desiredTargets(): `Option<u32>`
-- **interface**: `api.query.electionProviderMultiPhase.desiredTargets`
-- **summary**:   Desired number of targets to elect for this round. 
-
-  Only exists when [`Snapshot`] is present. 
- 
-### queuedSolution(): `Option<ReadySolution>`
-- **interface**: `api.query.electionProviderMultiPhase.queuedSolution`
-- **summary**:   Current best solution, signed or unsigned, queued to be returned upon `elect`. 
- 
-### round(): `u32`
-- **interface**: `api.query.electionProviderMultiPhase.round`
-- **summary**:   Internal counter for the number of rounds. 
-
-  This is useful for de-duplication of transactions submitted to the pool, and general diagnostics of the pallet. 
-
-  This is merely incremented once per every time that an upstream `elect` is called. 
- 
-### snapshot(): `Option<RoundSnapshot>`
-- **interface**: `api.query.electionProviderMultiPhase.snapshot`
-- **summary**:   Snapshot data of the round. 
-
-  This is created at the beginning of the signed phase and cleared upon calling `elect`. 
- 
-### snapshotMetadata(): `Option<SolutionOrSnapshotSize>`
-- **interface**: `api.query.electionProviderMultiPhase.snapshotMetadata`
-- **summary**:   The metadata of the [`RoundSnapshot`] 
-
-  Only exists when [`Snapshot`] is present. 
-
-___
-
-
 ## elections
  
-### candidates(): `Vec<(AccountId,BalanceOf)>`
+### candidates(): `Vec<AccountId>`
 - **interface**: `api.query.elections.candidates`
-- **summary**:   The present candidate list. A current member or runner-up can never enter this vector and is always implicitly assumed to be a candidate. 
-
-  Second element is the deposit. 
-
-  Invariant: Always sorted based on account id. 
+- **summary**:   The present candidate list. Sorted based on account-id. A current member or runner-up can never enter this vector and is always implicitly assumed to be a candidate. 
  
 ### electionRounds(): `u32`
 - **interface**: `api.query.elections.electionRounds`
 - **summary**:   The total number of vote rounds that have happened, excluding the upcoming one. 
  
-### members(): `Vec<SeatHolder>`
+### members(): `Vec<(AccountId,BalanceOf)>`
 - **interface**: `api.query.elections.members`
-- **summary**:   The current elected members. 
-
-  Invariant: Always sorted based on account id. 
+- **summary**:   The current elected membership. Sorted based on account id. 
  
-### runnersUp(): `Vec<SeatHolder>`
+### runnersUp(): `Vec<(AccountId,BalanceOf)>`
 - **interface**: `api.query.elections.runnersUp`
-- **summary**:   The current reserved runners-up. 
-
-  Invariant: Always sorted based on rank (worse to best). Upon removal of a member, the last (i.e. _best_) runner-up will be replaced. 
+- **summary**:   The current runners_up. Sorted based on low to high merit (worse to best). 
  
-### voting(`AccountId`): `Voter`
+### voting(`AccountId`): `(BalanceOf,Vec<AccountId>)`
 - **interface**: `api.query.elections.voting`
 - **summary**:   Votes and locked stake of a particular voter. 
 
-  TWOX-NOTE: SAFE as `AccountId` is a crypto hash. 
-
-___
-
-
-## gilt
- 
-### active(`ActiveIndex`): `Option<ActiveGilt>`
-- **interface**: `api.query.gilt.active`
-- **summary**:   The currently active gilts, indexed according to the order of creation. 
- 
-### activeTotal(): `ActiveGiltsTotal`
-- **interface**: `api.query.gilt.activeTotal`
-- **summary**:   Information relating to the gilts currently active. 
- 
-### queues(`u32`): `Vec<GiltBid>`
-- **interface**: `api.query.gilt.queues`
-- **summary**:   The queues of bids ready to become gilts. Indexed by duration (in `Period`s). 
- 
-### queueTotals(): `Vec<(u32,BalanceOf)>`
-- **interface**: `api.query.gilt.queueTotals`
-- **summary**:   The totals of items and balances within each queue. Saves a lot of storage reads in the case of sparsely packed queues. 
-
-  The vector is indexed by duration in `Period`s, offset by one, so information on the queue whose duration is one `Period` would be storage `0`. 
+  TWOX-NOTE: SAFE as `AccountId` is a crypto hash 
 
 ___
 
@@ -543,15 +450,13 @@ ___
  
 ### authoredBlocks(`SessionIndex, ValidatorId`): `u32`
 - **interface**: `api.query.imOnline.authoredBlocks`
-- **summary**:   For each session index, we keep a mapping of `ValidatorId<T>` to the number of blocks authored by the given authority. 
+- **summary**:   For each session index, we keep a mapping of `T::ValidatorId` to the number of blocks authored by the given authority. 
  
 ### heartbeatAfter(): `BlockNumber`
 - **interface**: `api.query.imOnline.heartbeatAfter`
-- **summary**:   The block number after which it's ok to send heartbeats in the current session. 
+- **summary**:   The block number after which it's ok to send heartbeats in current session. 
 
   At the beginning of each session we set this to a value that should fall roughly in the middle of the session duration. The idea is to first wait for the validators to produce a block in the current session, so that the heartbeat later on will not be necessary. 
-
-  This value will only be used as a fallback if we fail to get a proper session progress estimate from `NextSessionRotation`, as those estimates should be more accurate then the value we calculate for `HeartbeatAfter`. 
  
 ### keys(): `Vec<AuthorityId>`
 - **interface**: `api.query.imOnline.keys`
@@ -573,63 +478,46 @@ ___
 ___
 
 
-## lottery
+## market
  
-### callIndices(): `Vec<CallIndex>`
-- **interface**: `api.query.lottery.callIndices`
-- **summary**:   The calls stored in this pallet to be used in an active lottery if configured by `Config::ValidateCall`. 
+### filePrice(): `BalanceOf`
+- **interface**: `api.query.market.filePrice`
+- **summary**:   File price. It would change according to First Party Storage, Total Storage and Storage Base Ratio. 
  
-### lottery(): `Option<LotteryConfig>`
-- **interface**: `api.query.lottery.lottery`
-- **summary**:   The configuration for the current lottery. 
+### files(`MerkleRoot`): `Option<(FileInfo,UsedInfo)>`
+- **interface**: `api.query.market.files`
+- **summary**:   File information iterated by order id 
  
-### lotteryIndex(): `u32`
-- **interface**: `api.query.lottery.lotteryIndex`
+### filesSize(): `u128`
+- **interface**: `api.query.market.filesSize`
+- **summary**:   First Class Storage 
  
-### participants(`AccountId`): `(u32,Vec<CallIndex>)`
-- **interface**: `api.query.lottery.participants`
-- **summary**:   Users who have purchased a ticket. (Lottery Index, Tickets Purchased) 
+### marketSwitch(): `bool`
+- **interface**: `api.query.market.marketSwitch`
+- **summary**:   Market switch to enable place storage order 
  
-### tickets(`u32`): `Option<AccountId>`
-- **interface**: `api.query.lottery.tickets`
-- **summary**:   Each ticket's owner. 
-
-  May have residual storage from previous lotteries. Use `TicketsCount` to see which ones are actually valid ticket mappings. 
+### merchantLedgers(`AccountId`): `MerchantLedger`
+- **interface**: `api.query.market.merchantLedgers`
+- **summary**:   Merchant Ledger 
  
-### ticketsCount(): `u32`
-- **interface**: `api.query.lottery.ticketsCount`
-- **summary**:   Total number of tickets sold. 
-
-___
-
-
-## mmr
+### usedTrashI(`MerkleRoot`): `Option<UsedInfo>`
+- **interface**: `api.query.market.usedTrashI`
+- **summary**:   File trash to store second class storage 
  
-### nodes(`u64`): `Option<Hash>`
-- **interface**: `api.query.mmr.nodes`
-- **summary**:   Hashes of the nodes in the MMR. 
-
-  Note this collection only contains MMR peaks, the inner nodes (and leaves) are pruned and only stored in the Offchain DB. 
+### usedTrashII(`MerkleRoot`): `Option<UsedInfo>`
+- **interface**: `api.query.market.usedTrashII`
  
-### numberOfLeaves(): `u64`
-- **interface**: `api.query.mmr.numberOfLeaves`
-- **summary**:   Current size of the MMR (number of leaves). 
+### usedTrashMappingI(`SworkerAnchor`): `u64`
+- **interface**: `api.query.market.usedTrashMappingI`
  
-### rootHash(): `Hash`
-- **interface**: `api.query.mmr.rootHash`
-- **summary**:   Latest MMR Root hash. 
-
-___
-
-
-## multisig
+### usedTrashMappingII(`SworkerAnchor`): `u64`
+- **interface**: `api.query.market.usedTrashMappingII`
  
-### calls(`[u8;32]`): `Option<(OpaqueCall,AccountId,BalanceOf)>`
-- **interface**: `api.query.multisig.calls`
+### usedTrashSizeI(): `u128`
+- **interface**: `api.query.market.usedTrashSizeI`
  
-### multisigs(`AccountId, [u8;32]`): `Option<Multisig>`
-- **interface**: `api.query.multisig.multisigs`
-- **summary**:   The set of open multisig operations. 
+### usedTrashSizeII(): `u128`
+- **interface**: `api.query.market.usedTrashSizeII`
 
 ___
 
@@ -659,45 +547,11 @@ ___
 ___
 
 
-## proxy
- 
-### announcements(`AccountId`): `(Vec<ProxyAnnouncement>,BalanceOf)`
-- **interface**: `api.query.proxy.announcements`
-- **summary**:   The announcements made by the proxy (key). 
- 
-### proxies(`AccountId`): `(Vec<ProxyDefinition>,BalanceOf)`
-- **interface**: `api.query.proxy.proxies`
-- **summary**:   The set of account proxies. Maps the account which has delegated to the accounts which are being delegated to, together with the amount held on deposit. 
-
-___
-
-
 ## randomnessCollectiveFlip
  
 ### randomMaterial(): `Vec<Hash>`
 - **interface**: `api.query.randomnessCollectiveFlip.randomMaterial`
 - **summary**:   Series of block headers from the last 81 blocks that acts as random seed material. This is arranged as a ring buffer with `block_number % 81` being the index into the `Vec` of the oldest hash. 
-
-___
-
-
-## recovery
- 
-### activeRecoveries(`AccountId, AccountId`): `Option<ActiveRecovery>`
-- **interface**: `api.query.recovery.activeRecoveries`
-- **summary**:   Active recovery attempts. 
-
-  First account is the account to be recovered, and the second account is the user trying to recover the account. 
- 
-### proxy(`AccountId`): `Option<AccountId>`
-- **interface**: `api.query.recovery.proxy`
-- **summary**:   The list of allowed proxy accounts. 
-
-  Map from the user who can access it to the recovered account. 
- 
-### recoverable(`AccountId`): `Option<RecoveryConfig>`
-- **interface**: `api.query.recovery.recoverable`
-- **summary**:   The set of recoverable accounts and their recovery configuration. 
 
 ___
 
@@ -756,82 +610,13 @@ ___
 ___
 
 
-## society
- 
-### bids(): `Vec<Bid>`
-- **interface**: `api.query.society.bids`
-- **summary**:   The current bids, stored ordered by the value of the bid. 
- 
-### candidates(): `Vec<Bid>`
-- **interface**: `api.query.society.candidates`
-- **summary**:   The current set of candidates; bidders that are attempting to become members. 
- 
-### defender(): `Option<AccountId>`
-- **interface**: `api.query.society.defender`
-- **summary**:   The defending member currently being challenged. 
- 
-### defenderVotes(`AccountId`): `Option<SocietyVote>`
-- **interface**: `api.query.society.defenderVotes`
-- **summary**:   Votes for the defender. 
- 
-### founder(): `Option<AccountId>`
-- **interface**: `api.query.society.founder`
-- **summary**:   The first member. 
- 
-### head(): `Option<AccountId>`
-- **interface**: `api.query.society.head`
-- **summary**:   The most primary from the most recently approved members. 
- 
-### maxMembers(): `u32`
-- **interface**: `api.query.society.maxMembers`
-- **summary**:   The max number of members for the society at one time. 
- 
-### members(): `Vec<AccountId>`
-- **interface**: `api.query.society.members`
-- **summary**:   The current set of members, ordered. 
- 
-### payouts(`AccountId`): `Vec<(BlockNumber,BalanceOf)>`
-- **interface**: `api.query.society.payouts`
-- **summary**:   Pending payouts; ordered by block number, with the amount that should be paid out. 
- 
-### pot(): `BalanceOf`
-- **interface**: `api.query.society.pot`
-- **summary**:   Amount of our account balance that is specifically for the next round's bid(s). 
- 
-### rules(): `Option<Hash>`
-- **interface**: `api.query.society.rules`
-- **summary**:   A hash of the rules of this society concerning membership. Can only be set once and only by the founder. 
- 
-### strikes(`AccountId`): `StrikeCount`
-- **interface**: `api.query.society.strikes`
-- **summary**:   The ongoing number of losing votes cast by the member. 
- 
-### suspendedCandidates(`AccountId`): `Option<(BalanceOf,BidKind)>`
-- **interface**: `api.query.society.suspendedCandidates`
-- **summary**:   The set of suspended candidates. 
- 
-### suspendedMembers(`AccountId`): `bool`
-- **interface**: `api.query.society.suspendedMembers`
-- **summary**:   The set of suspended members. 
- 
-### votes(`AccountId, AccountId`): `Option<SocietyVote>`
-- **interface**: `api.query.society.votes`
-- **summary**:   Double map from Candidate -> Voter -> (Maybe) Vote. 
- 
-### vouching(`AccountId`): `Option<VouchingStatus>`
-- **interface**: `api.query.society.vouching`
-- **summary**:   Members currently vouching or banned from vouching again 
-
-___
-
-
 ## staking
  
 ### activeEra(): `Option<ActiveEraInfo>`
 - **interface**: `api.query.staking.activeEra`
 - **summary**:   The active era information, it holds index and start. 
 
-  The active era is the era being currently rewarded. Validator set of this era must be equal to [`SessionInterface::validators`]. 
+  The active era is the era currently rewarded. Validator set of this era must be equal to `SessionInterface::validators`. 
  
 ### bonded(`AccountId`): `Option<AccountId>`
 - **interface**: `api.query.staking.bonded`
@@ -840,28 +625,30 @@ ___
 ### bondedEras(): `Vec<(EraIndex,SessionIndex)>`
 - **interface**: `api.query.staking.bondedEras`
 - **summary**:   A mapping from still-bonded eras to the first session index of that era. 
-
-  Must contains information for eras for the range: `[active_era - bounding_duration; active_era]` 
  
 ### canceledSlashPayout(): `BalanceOf`
 - **interface**: `api.query.staking.canceledSlashPayout`
 - **summary**:   The amount of currency given to reporters of a slash event which was canceled by extraordinary circumstances (e.g. governance). 
  
+### currentElected(): `Vec<AccountId>`
+- **interface**: `api.query.staking.currentElected`
+- **summary**:   The currently elected validator set keyed by stash account ID. 
+ 
 ### currentEra(): `Option<EraIndex>`
 - **interface**: `api.query.staking.currentEra`
 - **summary**:   The current era index. 
-
-  This is the latest planned era, depending on how the Session pallet queues the validator set, it might be active or not. 
- 
-### currentPlannedSession(): `SessionIndex`
-- **interface**: `api.query.staking.currentPlannedSession`
-- **summary**:   The last planned session scheduled by the session pallet. 
-
-  This is basically in sync with the call to [`SessionManager::new_session`]. 
  
 ### earliestUnappliedSlash(): `Option<EraIndex>`
 - **interface**: `api.query.staking.earliestUnappliedSlash`
 - **summary**:   The earliest era for which we have a pending, unapplied slash. 
+ 
+### erasAuthoringPayout(`EraIndex, AccountId`): `Option<BalanceOf>`
+- **interface**: `api.query.staking.erasAuthoringPayout`
+- **summary**:   Authoring payout of validator at era. 
+ 
+### erasMarketPayout(`EraIndex`): `Option<BalanceOf>`
+- **interface**: `api.query.staking.erasMarketPayout`
+- **summary**:   Market staking payout of validator at era. 
  
 ### erasRewardPoints(`EraIndex`): `EraRewardPoints`
 - **interface**: `api.query.staking.erasRewardPoints`
@@ -879,21 +666,25 @@ ___
 - **interface**: `api.query.staking.erasStakersClipped`
 - **summary**:   Clipped Exposure of validator at era. 
 
-  This is similar to [`ErasStakers`] but number of nominators exposed is reduced to the `T::MaxNominatorRewardedPerValidator` biggest stakers. (Note: the field `total` and `own` of the exposure remains unchanged). This is used to limit the i/o cost for the nominator payout. 
+  This is similar to [`ErasStakers`] but number of guarantors exposed is reduced to the `T::MaxGuarantorRewardedPerValidator` biggest stakers. (Note: the field `total` and `own` of the exposure remains unchanged). This is used to limit the i/o cost for the guarantor payout. 
 
   This is keyed fist by the era index to allow bulk deletion and then the stash account. 
 
   Is it removed after `HISTORY_DEPTH` eras. If stakers hasn't been set or has been removed then empty exposure is returned. 
  
+### erasStakingPayout(`EraIndex`): `Option<BalanceOf>`
+- **interface**: `api.query.staking.erasStakingPayout`
+- **summary**:   Total staking payout at era. 
+ 
 ### erasStartSessionIndex(`EraIndex`): `Option<SessionIndex>`
 - **interface**: `api.query.staking.erasStartSessionIndex`
 - **summary**:   The session index at which the era start for the last `HISTORY_DEPTH` eras. 
-
-  Note: This tracks the starting session (i.e. session index when era start being active) for the eras in `[CurrentEra - HISTORY_DEPTH, CurrentEra]`. 
  
-### erasTotalStake(`EraIndex`): `BalanceOf`
-- **interface**: `api.query.staking.erasTotalStake`
-- **summary**:   The total amount staked for the last `HISTORY_DEPTH` eras. If total hasn't been set or has been removed then 0 stake is returned. 
+### erasTotalStakes(`EraIndex`): `BalanceOf`
+- **interface**: `api.query.staking.erasTotalStakes`
+- **summary**:   The amount of balance actively at stake for each validator slot, currently. 
+
+  This is used to derive rewards and punishments. 
  
 ### erasValidatorPrefs(`EraIndex, AccountId`): `ValidatorPrefs`
 - **interface**: `api.query.staking.erasValidatorPrefs`
@@ -903,23 +694,23 @@ ___
 
   Is it removed after `HISTORY_DEPTH` eras. 
  
-### erasValidatorReward(`EraIndex`): `Option<BalanceOf>`
-- **interface**: `api.query.staking.erasValidatorReward`
-- **summary**:   The total validator era payout for the last `HISTORY_DEPTH` eras. 
-
-  Eras that haven't finished yet or has been removed doesn't have reward. 
- 
 ### forceEra(): `Forcing`
 - **interface**: `api.query.staking.forceEra`
-- **summary**:   Mode of era forcing. 
+- **summary**:   True if the next session change will be a new era regardless of index. 
+ 
+### guarantors(`AccountId`): `Option<Guarantee>`
+- **interface**: `api.query.staking.guarantors`
+- **summary**:   The map from guarantor stash key to the set of stash keys of all validators to guarantee. 
+ 
+### guarantorSlashInEra(`EraIndex, AccountId`): `Option<BalanceOf>`
+- **interface**: `api.query.staking.guarantorSlashInEra`
+- **summary**:   All slashing events on guarantors, mapped by era to the highest slash value of the era. 
  
 ### historyDepth(): `u32`
 - **interface**: `api.query.staking.historyDepth`
 - **summary**:   Number of eras to keep in history. 
 
   Information is kept for eras in `[current_era - history_depth; current_era]`. 
-
-  Must be more than the number of eras delayed by session otherwise. I.e. active era must always be in history. I.e. `active_era > current_era - history_depth` must be guaranteed. 
  
 ### invulnerables(): `Vec<AccountId>`
 - **interface**: `api.query.staking.invulnerables`
@@ -932,14 +723,6 @@ ___
 ### minimumValidatorCount(): `u32`
 - **interface**: `api.query.staking.minimumValidatorCount`
 - **summary**:   Minimum number of staking participants before emergency conditions are imposed. 
- 
-### nominators(`AccountId`): `Option<Nominations>`
-- **interface**: `api.query.staking.nominators`
-- **summary**:   The map from nominator stash key to the set of stash keys of all validators to nominate. 
- 
-### nominatorSlashInEra(`EraIndex, AccountId`): `Option<BalanceOf>`
-- **interface**: `api.query.staking.nominatorSlashInEra`
-- **summary**:   All slashing events on nominators, mapped by era to the highest slash value of the era. 
  
 ### payee(`AccountId`): `RewardDestination`
 - **interface**: `api.query.staking.payee`
@@ -959,11 +742,13 @@ ___
 - **interface**: `api.query.staking.spanSlash`
 - **summary**:   Records information about the maximum slash of a stash within a slashing span, as well as how much reward has been paid out. 
  
-### storageVersion(): `Releases`
-- **interface**: `api.query.staking.storageVersion`
-- **summary**:   True if network has been upgraded to this version. Storage version of the pallet. 
-
-  This is set to v6.0.0 for new networks. 
+### stakeLimit(`AccountId`): `Option<BalanceOf>`
+- **interface**: `api.query.staking.stakeLimit`
+- **summary**:   The stake limit, determined all the staking operations This is keyed by the stash account. 
+ 
+### startRewardEra(): `EraIndex`
+- **interface**: `api.query.staking.startRewardEra`
+- **summary**:   Start era for reward curve 
  
 ### unappliedSlashes(`EraIndex`): `Vec<UnappliedSlash>`
 - **interface**: `api.query.staking.unappliedSlashes`
@@ -989,6 +774,62 @@ ___
 ### key(): `AccountId`
 - **interface**: `api.query.sudo.key`
 - **summary**:   The `AccountId` of the sudo key. 
+
+___
+
+
+## swork
+ 
+### aBExpire(): `Option<BlockNumber>`
+- **interface**: `api.query.swork.aBExpire`
+- **summary**:   The AB upgrade expired block, this should be managed by sudo/democracy 
+ 
+### code(): `SworkerCode`
+- **interface**: `api.query.swork.code`
+- **summary**:   The sWorker enclave code, this should be managed by sudo/democracy 
+ 
+### currentReportSlot(): `ReportSlot`
+- **interface**: `api.query.swork.currentReportSlot`
+- **summary**:   The current report slot block number, this value should be a multiple of era block 
+ 
+### enablePunishment(): `bool`
+- **interface**: `api.query.swork.enablePunishment`
+- **summary**:   Enable punishment, the default behavior will have punishment. 
+ 
+### free(): `u128`
+- **interface**: `api.query.swork.free`
+- **summary**:   The free workload, used for calculating stake limit in the end of era default is 0 
+ 
+### groups(`AccountId`): `BTreeSet<AccountId>`
+- **interface**: `api.query.swork.groups`
+- **summary**:   The group information 
+ 
+### historySlotDepth(): `ReportSlot`
+- **interface**: `api.query.swork.historySlotDepth`
+ 
+### identities(`AccountId`): `Option<Identity>`
+- **interface**: `api.query.swork.identities`
+- **summary**:   The bond relationship between AccountId <-> Identity 
+ 
+### pubKeys(`SworkerPubKey`): `PKInfo`
+- **interface**: `api.query.swork.pubKeys`
+- **summary**:   The sWorker information, mapping from sWorker public key to an optional pubkey information 
+ 
+### reportedFilesSize(): `u128`
+- **interface**: `api.query.swork.reportedFilesSize`
+- **summary**:   The total reported files workload, used for calculating total_capacity for market module default is 0 
+ 
+### reportedInSlot(`SworkerAnchor, ReportSlot`): `bool`
+- **interface**: `api.query.swork.reportedInSlot`
+- **summary**:   Recording whether the validator reported works of each era We leave it keep all era's report info cause B-tree won't build index on key2(ReportSlot) value represent if reported in this slot TODO: reverse the keys when we launch mainnet 
+ 
+### used(): `u128`
+- **interface**: `api.query.swork.used`
+- **summary**:   The used workload, used for calculating stake limit in the end of era default is 0 
+ 
+### workReports(`SworkerAnchor`): `Option<WorkReport>`
+- **interface**: `api.query.swork.workReports`
+- **summary**:   Node's work report, mapping from sWorker anchor to an optional work report WorkReport only been replaced, it won't get removed cause we need to check the status transition from off-chain sWorker 
 
 ___
 
@@ -1054,10 +895,6 @@ ___
 ### parentHash(): `Hash`
 - **interface**: `api.query.system.parentHash`
 - **summary**:   Hash of the previous block. 
- 
-### upgradedToTripleRefCount(): `bool`
-- **interface**: `api.query.system.upgradedToTripleRefCount`
-- **summary**:   True if we have upgraded so that AccountInfo contains three types of `RefCount`. False (default) if not. 
  
 ### upgradedToU32RefCount(): `bool`
 - **interface**: `api.query.system.upgradedToU32RefCount`
@@ -1158,15 +995,6 @@ ___
 ### proposals(`ProposalIndex`): `Option<TreasuryProposal>`
 - **interface**: `api.query.treasury.proposals`
 - **summary**:   Proposals that have been made. 
-
-___
-
-
-## vesting
- 
-### vesting(`AccountId`): `Option<VestingInfo>`
-- **interface**: `api.query.vesting.vesting`
-- **summary**:   Information regarding the vesting of a given account. 
 
 ___
 
