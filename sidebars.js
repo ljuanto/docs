@@ -50,7 +50,7 @@ module.exports = {
       },
       'api/FAQ'
     ],
-    'Substrate Metadata': [
+    'Crust Metadata': [
       'substrate/intro',
       'substrate/rpc',
       'substrate/constants',
