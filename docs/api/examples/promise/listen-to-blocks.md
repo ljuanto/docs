@@ -11,12 +11,16 @@ NOTE: The example runs until you stop it with CTRL+C
 ```javascript
 // Import the API
 const { ApiPromise } = require('@polkadot/api');
+const { typesBundleForPolkadot } = require('@crustio/type-definitions');
 
 async function main () {
   // Here we don't pass the (optional) provider, connecting directly to the default
   // node/port, i.e. `ws://127.0.0.1:9944`. Await for the isReady promise to ensure
   // the API has connected to the node and completed the initialisation process
-  const api = await ApiPromise.create();
+  const api = await ApiPromise.create({
+            provider: new WsProvider('ws://127.0.0.1:9944'),
+            typesBundle: typesBundleForPolkadot
+        });
 
   // We only display a couple, then unsubscribe
   let count = 0;

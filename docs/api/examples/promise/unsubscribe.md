@@ -9,10 +9,14 @@ In this example we're calling the built-in unsubscribe() function after a timeOu
 ```javascript
 // Import the API
 const { ApiPromise } = require('@polkadot/api');
+const { typesBundleForPolkadot } = require('@crustio/type-definitions');
 
 async function main () {
   // Create a new instance of the api
-  const api = await ApiPromise.create();
+  const api = await ApiPromise.create({
+            provider: new WsProvider('ws://127.0.0.1:9944'),
+            typesBundle: typesBundleForPolkadot
+        });
 
   // Subscribe to chain updates and log the current block number on update.
   const unsubscribe = await api.rpc.chain.subscribeNewHeads((header) => {

@@ -21,6 +21,7 @@ In the case of Node.js you would change the `import` into `require`, i.e.
 ```js
 // Import
 const { ApiPromise, WsProvider } = require('@polkadot/api');
+const { typesBundleForPolkadot } = require('@crustio/type-definitions');
 ...
 ```
 

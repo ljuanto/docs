@@ -11,7 +11,7 @@ Here you will find a list of examples that takes you through the basics of conne
 For the following examples, you need a local node. It is usually convenient testing with:
 
 ```
-substrate --dev
+crust --dev
 ```
 
 

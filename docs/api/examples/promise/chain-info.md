@@ -7,10 +7,14 @@ This example shows how to connect to the api and retrieve the chain information 
 ```javascript
 // Import the API
 const { ApiPromise } = require('@polkadot/api');
+const { typesBundleForPolkadot } = require('@crustio/type-definitions');
 
 async function main () {
   // Create a new instance of the api
-  const api = await ApiPromise.create();
+  const api = await ApiPromise.create({
+            provider: new WsProvider('ws://127.0.0.1:9944'),
+            typesBundle: typesBundleForPolkadot
+        });
   // get the chain information
   const chainInfo = await api.registry.getChainProperties()
 

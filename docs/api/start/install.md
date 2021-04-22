@@ -4,9 +4,9 @@ title: Installation
 
 Yes, it really is as simple as [installing from npm](https://www.npmjs.com/package/@polkadot/api), so we are not going to waste too much time with the bare basics, just install the API via
 
-`yarn add @polkadot/api`
+`yarn add @polkadot/api @crustio/type-definitions`
 
-And it will be added and ready for use. The above will always install the latest stable release, which should allow you to connect to test networks and local nodes that are tracking versioned releases for [Polkadot](https://github.com/paritytech/polkadot) and [Substrate](https://github.com/paritytech/substrate).
+And it will be added and ready for use. The above will always install the latest stable release, which should allow you to connect to test networks and local nodes that are tracking versioned releases for [Crust](https://github.com/crustio/crust) and [Substrate](https://github.com/paritytech/substrate).
 
 
 ## Betas

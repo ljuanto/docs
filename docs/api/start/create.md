@@ -7,11 +7,12 @@ We have the API installed, we have an understanding of what will actually be exp
 ```js
 // Import
 import { ApiPromise, WsProvider } from '@polkadot/api';
+import { typesBundleForPolkadot } from '@crustio/type-definitions';
 
 ...
 // Construct
-const wsProvider = new WsProvider('wss://rpc.polkadot.io');
-const api = await ApiPromise.create({ provider: wsProvider });
+const wsProvider = new WsProvider('wss://api.decloudf.com/');
+const api = await ApiPromise.create({ provider: wsProvider, typesBundle: typesBundleForPolkadot });
 
 // Do something
 console.log(api.genesisHash.toHex());
@@ -35,7 +36,7 @@ The API creation is done via the `ApiPromise.create` interface which is a shortc
 
 ```js
 ApiPromise
-  .create({ provider: wsProvider }).isReady
+  .create({ provider: wsProvider, typesBundle: typesBundleForPolkadot }).isReady
   .then((api) =>
     console.log(api.genesisHash.toHex())
   );
@@ -45,7 +46,7 @@ In most cases we would suggest using the `.create` shortcut, which really just t
 
 ```js
 // Create the instance
-const api = new ApiPromise({ provider: wsProvider });
+const api = new ApiPromise({ provider: wsProvider, typesBundle: typesBundleForPolkadot });
 
 // Wait until we are ready and connected
 await api.isReady;
