@@ -7,6 +7,7 @@ In addition to querying the latest storage, you can make storage queries at a sp
 ```javascript
 // Import the API
 const { ApiPromise } = require('@polkadot/api');
+const { typesBundleForPolkadot } = require('@crustio/type-definitions');
 
 // Our address for Alice on the dev chain
 const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
@@ -14,7 +15,10 @@ const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty';
 
 async function main () {
   // Create our API with a default connection to the local node
-  const api = await ApiPromise.create();
+  const api = await ApiPromise.create({
+            provider: new WsProvider('ws://127.0.0.1:9944'),
+            typesBundle: typesBundleForPolkadot
+        });
 
   // Retrieve the last block header, extracting the hash and parentHash
   const { hash, parentHash } = await api.rpc.chain.getHeader();

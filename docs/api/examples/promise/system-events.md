@@ -7,10 +7,14 @@ Query the system events and extract information from them. This example runs unt
 ```javascript
 // Import the API
 const { ApiPromise } = require('@polkadot/api');
+const { typesBundleForPolkadot } = require('@crustio/type-definitions');
 
 async function main () {
   // Create our API with a default connection to the local node
-  const api = await ApiPromise.create();
+  const api = await ApiPromise.create({
+            provider: new WsProvider('ws://127.0.0.1:9944'),
+            typesBundle: typesBundleForPolkadot
+        });
 
   // Subscribe to system events via storage
   api.query.system.events((events) => {

@@ -7,6 +7,7 @@ Performs a chain upgrade using the `sudo` module. This may brick your chain, so 
 ```javascript
 // Import the API & Provider and some utility functions
 const { ApiPromise, WsProvider } = require('@polkadot/api');
+const { typesBundleForPolkadot } = require('@crustio/type-definitions');
 
 // import the test keyring (already has dev keys for Alice, Bob, Charlie, Eve & Ferdie)
 const testKeyring = require('@polkadot/keyring/testing');
@@ -18,7 +19,10 @@ async function main () {
   const provider = new WsProvider('ws://127.0.0.1:9944');
 
   // Create the API and wait until ready (optional provider passed through)
-  const api = await ApiPromise.create({ provider });
+  const api = await ApiPromise.create({
+            provider,
+            typesBundle: typesBundleForPolkadot
+        });
 
   // Retrieve the upgrade key from the chain state
   const adminId = await api.query.sudo.key();

@@ -51,13 +51,13 @@ module.exports = {
       'api/FAQ'
     ],
     'Crust Metadata': [
-      'substrate/intro',
-      'substrate/rpc',
-      'substrate/constants',
-      'substrate/storage',
-      'substrate/extrinsics',
-      'substrate/events',
-      'substrate/errors'
+      'crust/intro',
+      'crust/rpc',
+      'crust/constants',
+      'crust/storage',
+      'crust/extrinsics',
+      'crust/events',
+      'crust/errors'
     ],
     Keyring: [
       'keyring/intro',

@@ -9,4 +9,4 @@ The API provides application developers the ability to query a node and interact
 
 For oft-repeated questions, the [FAQ](FAQ.md) may have what you are looking for.
 
-Separated from the API you will also find the [Substrate metadata](../substrate/intro.md) section that has an overview of the RPC, extrinsics, events and errors available on a typical Substrate node.
+Separated from the API you will also find the [Crust metadata](../crust/intro.md) section that has an overview of the RPC, extrinsics, events and errors available on a typical Substrate node.

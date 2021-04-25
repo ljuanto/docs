@@ -7,6 +7,7 @@ Display the events that occur during a transfer by sending a value to a random a
 ```javascript
 // Import the API & Provider and some utility functions
 const { ApiPromise } = require('@polkadot/api');
+const { typesBundleForPolkadot } = require('@crustio/type-definitions');
 
 // Import the test keyring (already has dev keys for Alice, Bob, Charlie, Eve & Ferdie)
 const testKeyring = require('@polkadot/keyring/testing');
@@ -20,7 +21,10 @@ const AMOUNT = 10000;
 
 async function main () {
   // Create the API and wait until ready
-  const api = await ApiPromise.create();
+  const api = await ApiPromise.create({
+            provider: new WsProvider('ws://127.0.0.1:9944'),
+            typesBundle: typesBundleForPolkadot
+        });
 
   // Create an instance of our testing keyring
   // If you're using ES6 module imports instead of require, just change this line to:
