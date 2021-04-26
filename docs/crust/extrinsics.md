@@ -12,6 +12,8 @@ The following sections contain Extrinsics methods are part of the default Substr
 
 - **[balances](#balances)**
 
+- **[benefits](#benefits)**
+
 - **[bounties](#bounties)**
 
 - **[candy](#candy)**
@@ -116,7 +118,20 @@ ___
 
   99% of the time you want [`transfer`] instead. 
 
-  [`transfer`]: struct.Module.html#method.transfer  
+  [`transfer`]: struct.Pallet.html#method.transfer  
+
+___
+
+
+## benefits
+ 
+### addBenefitFunds(value: `Compact<BalanceOf>`)
+- **interface**: `api.tx.benefits.addBenefitFunds`
+- **summary**:   Add benefit funds 
+ 
+### cutBenefitFunds(value: `Compact<BalanceOf>`)
+- **interface**: `api.tx.benefits.cutBenefitFunds`
+- **summary**:   Cut benefit funds 
 
 ___
 
@@ -278,31 +293,13 @@ ___
 ### claim(dest: `AccountId`, tx: `EthereumTxHash`, sig: `EcdsaSignature`)
 - **interface**: `api.tx.claims.claim`
  
-### claimCru18(dest: `AccountId`, sig: `EcdsaSignature`)
-- **interface**: `api.tx.claims.claimCru18`
-- **summary**:   Make real cru18 claims, should judge the ethereum signature 
- 
 ### mintClaim(tx: `EthereumTxHash`, who: `EthereumAddress`, value: `BalanceOf`)
 - **interface**: `api.tx.claims.mintClaim`
 - **summary**:   Mint the claim 
  
-### mintCru18Claim(address: `EthereumAddress`, amount: `BalanceOf`)
-- **interface**: `api.tx.claims.mintCru18Claim`
-- **summary**:   Mint the cru18 erc20 CRU18 locked token 
- 
 ### setClaimLimit(limit: `BalanceOf`)
 - **interface**: `api.tx.claims.setClaimLimit`
 - **summary**:   Set claim limit 
- 
-### setCru18Miner(new_cru18_miner: `LookupSource`)
-- **interface**: `api.tx.claims.setCru18Miner`
-- **summary**:   Sets cru18 miner 
-
-  The dispatch origin for this call must be _Root_. 
-
-  Parameters: 
-
-  - `new_cru18_miner`: The new cru18 miner's address, this is a cold pk needs to be offline
 
 ___
 
@@ -695,11 +692,23 @@ ___
 
 ## elections
  
+### cleanDefunctVoters(_num_voters: `u32`, _num_defunct: `u32`)
+- **interface**: `api.tx.elections.cleanDefunctVoters`
+- **summary**:   Clean all voters who are defunct (i.e. they do not serve any purpose at all). The deposit of the removed voters are returned. 
+
+  This is an root function to be used only for cleaning the state. 
+
+  The dispatch origin of this call must be root. 
+
+   
+ 
 ### removeMember(who: `LookupSource`, has_replacement: `bool`)
 - **interface**: `api.tx.elections.removeMember`
 - **summary**:   Remove a particular member from the set. This is effective immediately and the bond of the outgoing member is slashed. 
 
   If a runner-up is available, then the best runner-up will be removed and replaces the outgoing member. Otherwise, a new phragmen election is started. 
+
+  The dispatch origin of this call must be root. 
 
   Note that this does not affect the designated block number of the next election. 
 
@@ -707,45 +716,37 @@ ___
  
 ### removeVoter()
 - **interface**: `api.tx.elections.removeVoter`
-- **summary**:   Remove `origin` as a voter. This removes the lock and returns the bond. 
+- **summary**:   Remove `origin` as a voter. 
 
-   
+  This removes the lock and returns the deposit. 
+
+  The dispatch origin of this call must be signed and be a voter. 
  
 ### renounceCandidacy(renouncing: `Renouncing`)
 - **interface**: `api.tx.elections.renounceCandidacy`
 - **summary**:   Renounce one's intention to be a candidate for the next election round. 3 potential outcomes exist: 
 
-  - `origin` is a candidate and not elected in any set. In this case, the bond is  unreserved, returned and origin is removed as a candidate. 
+  - `origin` is a candidate and not elected in any set. In this case, the deposit is   unreserved, returned and origin is removed as a candidate. 
 
-  - `origin` is a current runner-up. In this case, the bond is unreserved, returned and  origin is removed as a runner-up. 
+  - `origin` is a current runner-up. In this case, the deposit is unreserved, returned and  origin is removed as a runner-up. 
 
-  - `origin` is a current member. In this case, the bond is unreserved and origin is  removed as a member, consequently not being a candidate for the next round anymore.   Similar to [`remove_voter`], if replacement runners exists, they are immediately used.  
- 
-### reportDefunctVoter(defunct: `DefunctVoter`)
-- **interface**: `api.tx.elections.reportDefunctVoter`
-- **summary**:   Report `target` for being an defunct voter. In case of a valid report, the reporter is rewarded by the bond amount of `target`. Otherwise, the reporter itself is removed and their bond is slashed. 
+  - `origin` is a current member. In this case, the deposit is unreserved and origin is  removed as a member, consequently not being a candidate for the next round anymore.   Similar to [`remove_members`], if replacement runners exists, they are immediately used.   If the prime is renouncing, then no prime will exist until the next round. 
 
-  A defunct voter is defined to be: 
-
-    - a voter whose current submitted votes are all invalid. i.e. all of them are no    longer a candidate nor an active member or a runner-up. 
-
-  
-
-  The origin must provide the number of current candidates and votes of the reported target for the purpose of accurate weight calculation. 
+  The dispatch origin of this call must be signed, and have one of the above roles. 
 
    
  
 ### submitCandidacy(candidate_count: `Compact<u32>`)
 - **interface**: `api.tx.elections.submitCandidacy`
-- **summary**:   Submit oneself for candidacy. 
+- **summary**:   Submit oneself for candidacy. A fixed amount of deposit is recorded. 
 
-  A candidate will either: 
+  All candidates are wiped at the end of the term. They either become a member/runner-up, or leave the system while their deposit is slashed. 
 
-    - Lose at the end of the term and forfeit their deposit.
+  The dispatch origin of this call must be signed. 
 
-    - Win and become a member. Members will eventually get their stash back.
+  #### Warning 
 
-    - Become a runner-up. Runners-ups are reserved members in case one gets forcefully    removed. 
+  Even if a candidate ends up being a member, they must call [`Call::renounce_candidacy`] to get their deposit back. Losing the spot in an election will always lead to a slash. 
 
    
  
@@ -753,7 +754,7 @@ ___
 - **interface**: `api.tx.elections.vote`
 - **summary**:   Vote for a set of candidates for the upcoming round of election. This can be called to set the initial votes, or update already existing votes. 
 
-  Upon initial voting, `value` units of `who`'s balance is locked and a bond amount is reserved. 
+  Upon initial voting, `value` units of `who`'s balance is locked and a deposit amount is reserved. The deposit is based on the number of votes and can be updated over time. 
 
   The `votes` should: 
 
@@ -761,7 +762,13 @@ ___
 
     - be less than the number of possible candidates. Note that all current members and    runners-up are also automatically candidates for the next round. 
 
-  It is the responsibility of the caller to not place all of their balance into the lock and keep some for further transactions. 
+  If `value` is more than `who`'s total balance, then the maximum of the two is used. 
+
+  The dispatch origin of this call must be signed. 
+
+  #### Warning 
+
+  It is the responsibility of the caller to **NOT** place all of their balance into the lock and keep some for further operations. 
 
    
 
@@ -1060,44 +1067,45 @@ ___
  
 ### addCollateral(value: `Compact<BalanceOf>`)
 - **interface**: `api.tx.market.addCollateral`
-- **summary**:   Collateral extra amount of currency to accept market order. 
+- **summary**:   Add extra collateral amount of currency to accept storage order. 
 
    
  
 ### addPrepaid(cid: `MerkleRoot`, amount: `Compact<BalanceOf>`)
 - **interface**: `api.tx.market.addPrepaid`
-- **summary**:   Place a storage order 
+- **summary**:   Add prepaid amount of currency for this file. If this file has prepaid value and enough for a new storage order, it can be renewed by anyone. 
  
 ### calculateReward(cid: `MerkleRoot`)
 - **interface**: `api.tx.market.calculateReward`
-- **summary**:   Calculate the payout 
+- **summary**:   Calculate the reward for a file 
  
 ### cutCollateral(value: `Compact<BalanceOf>`)
 - **interface**: `api.tx.market.cutCollateral`
-- **summary**:   Decrease collateral amount of currency for market order. 
+- **summary**:   Decrease extra collateral amount of currency to accept storage order. 
 
    
  
 ### placeStorageOrder(cid: `MerkleRoot`, reported_file_size: `u64`, tips: `Compact<BalanceOf>`)
 - **interface**: `api.tx.market.placeStorageOrder`
-- **summary**:   Place a storage order 
+- **summary**:   Place a storage order. The cid and file_size of this file should be provided. Extra tips is accepted. 
  
 ### register(collateral: `Compact<BalanceOf>`)
 - **interface**: `api.tx.market.register`
-- **summary**:   Register to be a merchant, you should provide your storage layer's address info this will require you to collateral first, complexity depends on `Collaterals`(P). 
+- **summary**:   Register to be a merchant. This will require you to collateral first, complexity depends on `Collaterals`(P). 
 
    
  
 ### rewardMerchant()
 - **interface**: `api.tx.market.rewardMerchant`
-- **summary**:   Reward the merchant 
+- **summary**:   Reward a merchant 
+ 
+### setBaseFee(base_fee: `Compact<BalanceOf>`)
+- **interface**: `api.tx.market.setBaseFee`
+- **summary**:   Set the file base fee 
  
 ### setMarketSwitch(is_enabled: `bool`)
 - **interface**: `api.tx.market.setMarketSwitch`
 - **summary**:   Set the global switch 
- 
-### showPots()
-- **interface**: `api.tx.market.showPots`
 
 ___
 
@@ -1278,6 +1286,14 @@ ___
 
    
  
+### rebond(value: `Compact<BalanceOf>`)
+- **interface**: `api.tx.staking.rebond`
+- **summary**:   Rebond a portion of the stash scheduled to be unlocked. 
+
+  The dispatch origin must be signed by the controller, and it can be only called when [`EraElectionStatus`] is `Closed`. 
+
+   
+ 
 ### rechargeStakingPot(value: `Compact<BalanceOf>`)
 - **interface**: `api.tx.staking.rechargeStakingPot`
 - **summary**:   Recharge the staking pot 
@@ -1330,9 +1346,6 @@ ___
   The dispatch origin must be Root. 
 
    
- 
-### showPots()
-- **interface**: `api.tx.staking.showPots`
  
 ### unbond(value: `Compact<BalanceOf>`)
 - **interface**: `api.tx.staking.unbond`
@@ -1418,18 +1431,23 @@ ___
  
 ### cancelPunishment(target: `LookupSource`)
 - **interface**: `api.tx.swork.cancelPunishment`
+- **summary**:   Cancel punishment for a specific account. This can only be done by Root/Democracy. 
  
 ### createGroup()
 - **interface**: `api.tx.swork.createGroup`
+- **summary**:   Create a group. One account can only create one group once. 
  
 ### joinGroup(target: `LookupSource`)
 - **interface**: `api.tx.swork.joinGroup`
+- **summary**:   Join a group. The account should already report works once and cannot have any used value. The target must be a group owner. 
  
 ### kickOut(target: `LookupSource`)
 - **interface**: `api.tx.swork.kickOut`
+- **summary**:   Kick someone out of this group. 
  
 ### quitGroup()
 - **interface**: `api.tx.swork.quitGroup`
+- **summary**:   Quit a group. 
  
 ### register(ias_sig: `IASSig`, ias_cert: `SworkerCert`, applier: `AccountId`, isv_body: `ISVBody`, sig: `SworkerSignature`)
 - **interface**: `api.tx.swork.register`
@@ -1451,13 +1469,9 @@ ___
 
    
  
-### setPunishment(is_enabled: `bool`)
-- **interface**: `api.tx.swork.setPunishment`
-- **summary**:   Set the punishment flag 
- 
-### upgrade(new_code: `SworkerCode`, expire_block: `BlockNumber`)
-- **interface**: `api.tx.swork.upgrade`
-- **summary**:   AB Upgrade, this should only be called by `root` origin Ruled by `sudo/democracy` 
+### setCode(new_code: `SworkerCode`, expire_block: `BlockNumber`)
+- **interface**: `api.tx.swork.setCode`
+- **summary**:   Set code for AB Upgrade, this should only be called by `root` origin Ruled by `sudo/democracy` 
 
    
 
@@ -1517,12 +1531,6 @@ ___
 ### setStorage(items: `Vec<KeyValue>`)
 - **interface**: `api.tx.system.setStorage`
 - **summary**:   Set some items of storage. 
-
-   
- 
-### suicide()
-- **interface**: `api.tx.system.suicide`
-- **summary**:   Kill the sending account, assuming there are no references outstanding and the composite data is equal to its default value. 
 
    
 
@@ -1713,6 +1721,18 @@ ___
   - `hash`: The identity of the open tip for which a tip value is declared. This is formed   as the hash of the tuple of the original tip `reason` and the beneficiary account ID. 
 
   Emits `TipRetracted` if successful. 
+
+   
+ 
+### slashTip(hash: `Hash`)
+- **interface**: `api.tx.tips.slashTip`
+- **summary**:   Remove and slash an already-open tip. 
+
+  May only be called from `T::RejectOrigin`. 
+
+  As a result, the finder is slashed and the deposits are lost. 
+
+  Emits `TipSlashed` if successful. 
 
    
  

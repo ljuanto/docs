@@ -12,6 +12,8 @@ The following sections contain Storage methods are part of the default Substrate
 
 - **[balances](#balances)**
 
+- **[benefits](#benefits)**
+
 - **[bounties](#bounties)**
 
 - **[candy](#candy)**
@@ -44,6 +46,8 @@ The following sections contain Storage methods are part of the default Substrate
 
 - **[staking](#staking)**
 
+- **[substrate](#substrate)**
+
 - **[sudo](#sudo)**
 
 - **[swork](#swork)**
@@ -61,8 +65,6 @@ The following sections contain Storage methods are part of the default Substrate
 - **[transactionPayment](#transactionpayment)**
 
 - **[treasury](#treasury)**
-
-- **[substrate](#substrate)**
 
 
 ___
@@ -95,7 +97,7 @@ ___
 - **interface**: `api.query.babe.authorVrfRandomness`
 - **summary**:   Temporary value (cleared at block finalization) that includes the VRF output generated at this block. This field should always be populated during block processing unless secondary plain slots are enabled (which don't contain a VRF output). 
  
-### currentSlot(): `u64`
+### currentSlot(): `Slot`
 - **interface**: `api.query.babe.currentSlot`
 - **summary**:   Current slot number. 
  
@@ -103,7 +105,7 @@ ___
 - **interface**: `api.query.babe.epochIndex`
 - **summary**:   Current epoch index. 
  
-### genesisSlot(): `u64`
+### genesisSlot(): `Slot`
 - **interface**: `api.query.babe.genesisSlot`
 - **summary**:   The slot at which the first epoch actually started. This is 0 until the first block of the chain. 
  
@@ -116,6 +118,10 @@ ___
 - **summary**:   How late the current block is compared to its parent. 
 
   This entry is populated as part of block execution and is cleaned up on block finalization. Querying this storage entry outside of block execution context should always yield zero. 
+ 
+### nextAuthorities(): `Vec<(AuthorityId,BabeAuthorityWeight)>`
+- **interface**: `api.query.babe.nextAuthorities`
+- **summary**:   Next epoch authorities. 
  
 ### nextEpochConfig(): `Option<NextConfigDescriptor>`
 - **interface**: `api.query.babe.nextEpochConfig`
@@ -154,7 +160,7 @@ ___
 - **interface**: `api.query.balances.account`
 - **summary**:   The balance of an account. 
 
-  NOTE: This is only used in the case that this module is used to store balances. 
+  NOTE: This is only used in the case that this pallet is used to store balances. 
  
 ### locks(`AccountId`): `Vec<BalanceLock>`
 - **interface**: `api.query.balances.locks`
@@ -169,6 +175,19 @@ ___
 ### totalIssuance(): `Balance`
 - **interface**: `api.query.balances.totalIssuance`
 - **summary**:   The total units issued in the system. 
+
+___
+
+
+## benefits
+ 
+### currentBenefits(): `EraBenefits`
+- **interface**: `api.query.benefits.currentBenefits`
+- **summary**:   The global benefits information 
+ 
+### feeReductionBenefits(`AccountId`): `FeeReductionBenefit`
+- **interface**: `api.query.benefits.feeReductionBenefits`
+- **summary**:   The fee reduction 
 
 ___
 
@@ -214,43 +233,18 @@ ___
  
 ### claimed(`EthereumTxHash`): `bool`
 - **interface**: `api.query.claims.claimed`
-- **summary**:   If `Claims(EthereumTxHash)` already been claimed, prevent double claim. 
  
 ### claimLimit(): `BalanceOf`
 - **interface**: `api.query.claims.claimLimit`
-- **summary**:   Claim limit deciding how much CRUPV can be mint. 
  
 ### claims(`EthereumTxHash`): `Option<(EthereumAddress,BalanceOf)>`
 - **interface**: `api.query.claims.claims`
-- **summary**:   Mapping with [EthereumTxHash: (EthereumAddress, TokenAmount)], mining by `Miner`. 
- 
-### cru18Claimed(`EthereumAddress`): `bool`
-- **interface**: `api.query.claims.cru18Claimed`
-- **summary**:   If `Cru18Tokens(EthereumAddress)` already been claimed, prevent double claim. 
- 
-### cru18Claims(`EthereumAddress, AccountId`): `Option<BalanceOf>`
-- **interface**: `api.query.claims.cru18Claims`
-- **summary**:   CRU18 claims information with [EthereumAddress, Cru18PubKey]. 
- 
-### cru18Miner(): `Option<AccountId>`
-- **interface**: `api.query.claims.cru18Miner`
-- **summary**:   Cru18 miner set by sudo. 
- 
-### cru18PreClaims(`EthereumAddress`): `Option<BalanceOf>`
-- **interface**: `api.query.claims.cru18PreClaims`
-- **summary**:   ERC20 CRU18 locked tokens, to be claimed information. 
- 
-### cru18TotalClaimed(): `BalanceOf`
-- **interface**: `api.query.claims.cru18TotalClaimed`
-- **summary**:   Claimed CRU18 locked tokens. 
  
 ### miner(): `Option<AccountId>`
 - **interface**: `api.query.claims.miner`
-- **summary**:   Maxwell miner set by sudo. 
  
 ### superior(): `Option<AccountId>`
 - **interface**: `api.query.claims.superior`
-- **summary**:   Controlling the CRUPV claim limit, set by sudo. 
 
 ___
 
@@ -361,27 +355,35 @@ ___
 
 ## elections
  
-### candidates(): `Vec<AccountId>`
+### candidates(): `Vec<(AccountId,BalanceOf)>`
 - **interface**: `api.query.elections.candidates`
-- **summary**:   The present candidate list. Sorted based on account-id. A current member or runner-up can never enter this vector and is always implicitly assumed to be a candidate. 
+- **summary**:   The present candidate list. A current member or runner-up can never enter this vector and is always implicitly assumed to be a candidate. 
+
+  Second element is the deposit. 
+
+  Invariant: Always sorted based on account id. 
  
 ### electionRounds(): `u32`
 - **interface**: `api.query.elections.electionRounds`
 - **summary**:   The total number of vote rounds that have happened, excluding the upcoming one. 
  
-### members(): `Vec<(AccountId,BalanceOf)>`
+### members(): `Vec<SeatHolder>`
 - **interface**: `api.query.elections.members`
-- **summary**:   The current elected membership. Sorted based on account id. 
+- **summary**:   The current elected members. 
+
+  Invariant: Always sorted based on account id. 
  
-### runnersUp(): `Vec<(AccountId,BalanceOf)>`
+### runnersUp(): `Vec<SeatHolder>`
 - **interface**: `api.query.elections.runnersUp`
-- **summary**:   The current runners_up. Sorted based on low to high merit (worse to best). 
+- **summary**:   The current reserved runners-up. 
+
+  Invariant: Always sorted based on rank (worse to best). Upon removal of a member, the last (i.e. _best_) runner-up will be replaced. 
  
-### voting(`AccountId`): `(BalanceOf,Vec<AccountId>)`
+### voting(`AccountId`): `Voter`
 - **interface**: `api.query.elections.voting`
 - **summary**:   Votes and locked stake of a particular voter. 
 
-  TWOX-NOTE: SAFE as `AccountId` is a crypto hash 
+  TWOX-NOTE: SAFE as `AccountId` is a crypto hash. 
 
 ___
 
@@ -450,7 +452,7 @@ ___
  
 ### authoredBlocks(`SessionIndex, ValidatorId`): `u32`
 - **interface**: `api.query.imOnline.authoredBlocks`
-- **summary**:   For each session index, we keep a mapping of `T::ValidatorId` to the number of blocks authored by the given authority. 
+- **summary**:   For each session index, we keep a mapping of `ValidatorId<T>` to the number of blocks authored by the given authority. 
  
 ### heartbeatAfter(): `BlockNumber`
 - **interface**: `api.query.imOnline.heartbeatAfter`
@@ -480,44 +482,53 @@ ___
 
 ## market
  
+### fileBaseFee(): `BalanceOf`
+- **interface**: `api.query.market.fileBaseFee`
+- **summary**:   The file base fee for each storage order. 
+ 
 ### filePrice(): `BalanceOf`
 - **interface**: `api.query.market.filePrice`
-- **summary**:   File price. It would change according to First Party Storage, Total Storage and Storage Base Ratio. 
+- **summary**:   The file price per MB. It's dynamically adjusted and would change according to FilesSize, TotalCapacity and StorageReferenceRatio. 
  
 ### files(`MerkleRoot`): `Option<(FileInfo,UsedInfo)>`
 - **interface**: `api.query.market.files`
-- **summary**:   File information iterated by order id 
+- **summary**:   The file information and used information iterated by ipfs cid. It includes file related info such as file size, expired date and reported replica count. 
  
 ### filesSize(): `u128`
 - **interface**: `api.query.market.filesSize`
-- **summary**:   First Class Storage 
+- **summary**:   The total files size in Byte. 
  
 ### marketSwitch(): `bool`
 - **interface**: `api.query.market.marketSwitch`
-- **summary**:   Market switch to enable place storage order 
+- **summary**:   The global market switch to enable place storage order 
  
 ### merchantLedgers(`AccountId`): `MerchantLedger`
 - **interface**: `api.query.market.merchantLedgers`
-- **summary**:   Merchant Ledger 
+- **summary**:   The merchant ledger, which contains the collateral and reward value for each merchant. 
  
 ### usedTrashI(`MerkleRoot`): `Option<UsedInfo>`
 - **interface**: `api.query.market.usedTrashI`
-- **summary**:   File trash to store second class storage 
+- **summary**:   The first file trash to store overdue files for a while 
  
 ### usedTrashII(`MerkleRoot`): `Option<UsedInfo>`
 - **interface**: `api.query.market.usedTrashII`
+- **summary**:   The second file trash to store overdue files for a while 
  
 ### usedTrashMappingI(`SworkerAnchor`): `u64`
 - **interface**: `api.query.market.usedTrashMappingI`
+- **summary**:   The total counted used size for each anchor in the first file trash 
  
 ### usedTrashMappingII(`SworkerAnchor`): `u64`
 - **interface**: `api.query.market.usedTrashMappingII`
+- **summary**:   The total counted used size for each anchor in the second file trash 
  
 ### usedTrashSizeI(): `u128`
 - **interface**: `api.query.market.usedTrashSizeI`
+- **summary**:   The count of overdue files in the first file trash 
  
 ### usedTrashSizeII(): `u128`
 - **interface**: `api.query.market.usedTrashSizeII`
+- **summary**:   The count of overdue files in the second file trash 
 
 ___
 
@@ -769,6 +780,33 @@ ___
 ___
 
 
+## substrate
+
+_These are well-known keys that are always available to the runtime implementation of any Substrate-based network._
+ 
+### changesTrieConfig(): `u32`
+- **interface**: `api.query.substrate.changesTrieConfig`
+- **summary**:   Changes trie configuration is stored under this key. 
+ 
+### childStorageKeyPrefix(): `u32`
+- **interface**: `api.query.substrate.childStorageKeyPrefix`
+- **summary**:   Prefix of child storage keys. 
+ 
+### code(): `Bytes`
+- **interface**: `api.query.substrate.code`
+- **summary**:   Wasm code of the runtime. 
+ 
+### extrinsicIndex(): `u32`
+- **interface**: `api.query.substrate.extrinsicIndex`
+- **summary**:   Current extrinsic index (u32) is stored under this key. 
+ 
+### heapPages(): `u64`
+- **interface**: `api.query.substrate.heapPages`
+- **summary**:   Number of wasm linear memory pages required for execution of the runtime. 
+
+___
+
+
 ## sudo
  
 ### key(): `AccountId`
@@ -780,25 +818,17 @@ ___
 
 ## swork
  
-### aBExpire(): `Option<BlockNumber>`
-- **interface**: `api.query.swork.aBExpire`
-- **summary**:   The AB upgrade expired block, this should be managed by sudo/democracy 
- 
-### code(): `SworkerCode`
-- **interface**: `api.query.swork.code`
-- **summary**:   The sWorker enclave code, this should be managed by sudo/democracy 
+### codes(`SworkerCode`): `Option<BlockNumber>`
+- **interface**: `api.query.swork.codes`
+- **summary**:   The sWorker enclave codes, this should be managed by sudo/democracy 
  
 ### currentReportSlot(): `ReportSlot`
 - **interface**: `api.query.swork.currentReportSlot`
-- **summary**:   The current report slot block number, this value should be a multiple of era block 
- 
-### enablePunishment(): `bool`
-- **interface**: `api.query.swork.enablePunishment`
-- **summary**:   Enable punishment, the default behavior will have punishment. 
+- **summary**:   The current report slot block number, this value should be a multiple of report slot block. 
  
 ### free(): `u128`
 - **interface**: `api.query.swork.free`
-- **summary**:   The free workload, used for calculating stake limit in the end of era default is 0 
+- **summary**:   The free workload, used for calculating stake limit in the end of each report slot. The default value is 0. 
  
 ### groups(`AccountId`): `BTreeSet<AccountId>`
 - **interface**: `api.query.swork.groups`
@@ -806,30 +836,31 @@ ___
  
 ### historySlotDepth(): `ReportSlot`
 - **interface**: `api.query.swork.historySlotDepth`
+- **summary**:   The depth of the history of the ReportedInSlot 
  
 ### identities(`AccountId`): `Option<Identity>`
 - **interface**: `api.query.swork.identities`
-- **summary**:   The bond relationship between AccountId <-> Identity 
+- **summary**:   The identity information for each sworker member, which contains the anchor, punishment deadline and group information. 
  
 ### pubKeys(`SworkerPubKey`): `PKInfo`
 - **interface**: `api.query.swork.pubKeys`
-- **summary**:   The sWorker information, mapping from sWorker public key to an optional pubkey information 
+- **summary**:   The pub key information, mapping from sWorker public key to an pubkey information, including the sworker enclave code and option anchor. 
  
 ### reportedFilesSize(): `u128`
 - **interface**: `api.query.swork.reportedFilesSize`
-- **summary**:   The total reported files workload, used for calculating total_capacity for market module default is 0 
+- **summary**:   The total reported files workload, used for calculating total_capacity for market module The default value is 0. 
  
 ### reportedInSlot(`SworkerAnchor, ReportSlot`): `bool`
 - **interface**: `api.query.swork.reportedInSlot`
-- **summary**:   Recording whether the validator reported works of each era We leave it keep all era's report info cause B-tree won't build index on key2(ReportSlot) value represent if reported in this slot TODO: reverse the keys when we launch mainnet 
+- **summary**:   Recording whether the validator reported works of each report slot. We keep the last "HistorySlotDepth" length data cause B-tree won't build index on key2(ReportSlot). The value represent if reported in this slot 
  
 ### used(): `u128`
 - **interface**: `api.query.swork.used`
-- **summary**:   The used workload, used for calculating stake limit in the end of era default is 0 
+- **summary**:   The used workload, used for calculating stake limit in the end of each report slot. The default value is 0. 
  
 ### workReports(`SworkerAnchor`): `Option<WorkReport>`
 - **interface**: `api.query.swork.workReports`
-- **summary**:   Node's work report, mapping from sWorker anchor to an optional work report WorkReport only been replaced, it won't get removed cause we need to check the status transition from off-chain sWorker 
+- **summary**:   Node's work report, mapping from sWorker anchor to an optional work report. WorkReport only been replaced, it won't get removed cause we need to check the status transition from off-chain sWorker 
 
 ___
 
@@ -895,6 +926,10 @@ ___
 ### parentHash(): `Hash`
 - **interface**: `api.query.system.parentHash`
 - **summary**:   Hash of the previous block. 
+ 
+### upgradedToDualRefCount(): `bool`
+- **interface**: `api.query.system.upgradedToDualRefCount`
+- **summary**:   True if we have upgraded so that AccountInfo contains two types of `RefCount`. False (default) if not. 
  
 ### upgradedToU32RefCount(): `bool`
 - **interface**: `api.query.system.upgradedToU32RefCount`
@@ -995,25 +1030,3 @@ ___
 ### proposals(`ProposalIndex`): `Option<TreasuryProposal>`
 - **interface**: `api.query.treasury.proposals`
 - **summary**:   Proposals that have been made. 
-
-___
-
-
-## substrate
-
-_These are keys that are always available to the runtime implementation_
- 
-### changesTrieConfig(): `u32`
-- **summary**: Changes trie configuration is stored under this key.
- 
-### childStorageKeyPrefix(): `u32`
-- **summary**: Prefix of child storage keys.
- 
-### code(): `Bytes`
-- **summary**: Wasm code of the runtime.
- 
-### extrinsicIndex(): `u32`
-- **summary**: Current extrinsic index (u32) is stored under this key.
- 
-### heapPages(): `u64`
-- **summary**: Number of wasm linear memory pages required for execution of the runtime.

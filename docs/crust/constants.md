@@ -46,7 +46,7 @@ ___
  
 ### epochDuration: `u64`
 - **interface**: `api.consts.babe.epochDuration`
-- **summary**:   The number of **slots** that an epoch takes. We couple sessions to epochs, i.e. we start a new session once the new epoch begins. 
+- **summary**:   The number of **slots** that an epoch takes. We couple sessions to epochs, i.e. we start a new session once the new epoch begins. NOTE: Currently it is not possible to change the epoch duration after the chain has started. Attempting to do so will brick block production. 
  
 ### expectedBlockTime: `Moment`
 - **interface**: `api.consts.babe.expectedBlockTime`
@@ -77,6 +77,10 @@ ___
 ### bountyDepositPayoutDelay: `BlockNumber`
 - **interface**: `api.consts.bounties.bountyDepositPayoutDelay`
 - **summary**:   The delay period for which a bounty beneficiary need to wait before claim the payout. 
+ 
+### bountyUpdatePeriod: `BlockNumber`
+- **interface**: `api.consts.bounties.bountyUpdatePeriod`
+- **summary**:   Bounty duration in blocks. 
  
 ### bountyValueMinimum: `BalanceOf`
 - **interface**: `api.consts.bounties.bountyValueMinimum`
@@ -158,8 +162,11 @@ ___
 ### termDuration: `BlockNumber`
 - **interface**: `api.consts.elections.termDuration`
  
-### votingBond: `BalanceOf`
-- **interface**: `api.consts.elections.votingBond`
+### votingBondBase: `BalanceOf`
+- **interface**: `api.consts.elections.votingBondBase`
+ 
+### votingBondFactor: `BalanceOf`
+- **interface**: `api.consts.elections.votingBondFactor`
 
 ___
 
@@ -204,25 +211,21 @@ ___
 
 ## market
  
-### fileBaseFee: `BalanceOf`
-- **interface**: `api.consts.market.fileBaseFee`
-- **summary**:   File Base Fee. 
- 
 ### fileDuration: `BlockNumber`
 - **interface**: `api.consts.market.fileDuration`
-- **summary**:   File duration. 
+- **summary**:   The file duration. 
  
 ### fileInitPrice: `BalanceOf`
 - **interface**: `api.consts.market.fileInitPrice`
-- **summary**:   File Init Price. 
+- **summary**:   The file init price after the chain start. 
  
 ### fileReplica: `u32`
 - **interface**: `api.consts.market.fileReplica`
-- **summary**:   File base replica. 
+- **summary**:   The file base replica to get reward. 
  
 ### maximumFileSize: `u64`
 - **interface**: `api.consts.market.maximumFileSize`
-- **summary**:   Max size of a file 
+- **summary**:   The max file size of a file 
  
 ### moduleId: `ModuleId`
 - **interface**: `api.consts.market.moduleId`
@@ -230,31 +233,31 @@ ___
  
 ### renewRewardRatio: `Perbill`
 - **interface**: `api.consts.market.renewRewardRatio`
-- **summary**:   Renew reward ratio. 
+- **summary**:   The renew reward ratio for liquidator. 
  
 ### stakingRatio: `Perbill`
 - **interface**: `api.consts.market.stakingRatio`
-- **summary**:   Storage / Staking ratio. 
+- **summary**:   The staking ratio for how much CRU into staking pot. 
  
 ### storageDecreaseRatio: `Perbill`
 - **interface**: `api.consts.market.storageDecreaseRatio`
-- **summary**:   Storage decrease ratio. 
+- **summary**:   The storage decrease ratio for each file price change. 
  
 ### storageIncreaseRatio: `Perbill`
 - **interface**: `api.consts.market.storageIncreaseRatio`
-- **summary**:   Storage increase ratio. 
+- **summary**:   The storage increase ratio for each file price change. 
+ 
+### storageRatio: `Perbill`
+- **interface**: `api.consts.market.storageRatio`
+- **summary**:   The storage ratio for how much CRU into storage pot. 
  
 ### storageReferenceRatio: `(u128,u128)`
 - **interface**: `api.consts.market.storageReferenceRatio`
-- **summary**:   Storage reference ratio. files_size / total_capacity 
- 
-### taxRatio: `Perbill`
-- **interface**: `api.consts.market.taxRatio`
-- **summary**:   Tax / Storage plus Staking ratio. 
+- **summary**:   The storage reference ratio to adjust the file price. 
  
 ### usedTrashMaxSize: `u128`
 - **interface**: `api.consts.market.usedTrashMaxSize`
-- **summary**:   Max size of used trash. 
+- **summary**:   The max size of used trash. 
 
 ___
 
@@ -304,11 +307,11 @@ ___
  
 ### maxGroupSize: `u32`
 - **interface**: `api.consts.swork.maxGroupSize`
-- **summary**:   Max number of members in one group 
+- **summary**:   The max number of members in one group 
  
 ### punishmentSlots: `u32`
 - **interface**: `api.consts.swork.punishmentSlots`
-- **summary**:   Punishment duration if someone offline 
+- **summary**:   The punishment duration if someone offline 
 
 ___
 
@@ -317,15 +320,29 @@ ___
  
 ### blockHashCount: `BlockNumber`
 - **interface**: `api.consts.system.blockHashCount`
-- **summary**:   The maximum number of blocks to allow in mortal eras. 
+- **summary**:   Maximum number of block number to block hash mappings to keep (oldest pruned first). 
+ 
+### blockLength: `BlockLength`
+- **interface**: `api.consts.system.blockLength`
+- **summary**:   The maximum length of a block (in bytes). 
  
 ### blockWeights: `BlockWeights`
 - **interface**: `api.consts.system.blockWeights`
-- **summary**:   The weight configuration (limits & base values) for each class of extrinsics and block. 
+- **summary**:   Block & extrinsics weights: base values and limits. 
  
 ### dbWeight: `RuntimeDbWeight`
 - **interface**: `api.consts.system.dbWeight`
 - **summary**:   The weight of runtime database operations the runtime can invoke. 
+ 
+### ss58Prefix: `u8`
+- **interface**: `api.consts.system.ss58Prefix`
+- **summary**:   The designated SS85 prefix of this chain. 
+
+  This replaces the "ss58Format" property declared in the chain spec. Reason is that the runtime should know about the prefix in order to make use of it as an identifier of the chain. 
+ 
+### version: `RuntimeVersion`
+- **interface**: `api.consts.system.version`
+- **summary**:   Get the chain's current version. 
 
 ___
 
