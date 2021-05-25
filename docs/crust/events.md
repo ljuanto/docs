@@ -8,8 +8,6 @@ Events are emitted for certain operations on the runtime. The following sections
 
 - **[balances](#balances)**
 
-- **[benefits](#benefits)**
-
 - **[bounties](#bounties)**
 
 - **[candy](#candy)**
@@ -17,6 +15,10 @@ Events are emitted for certain operations on the runtime. The following sections
 - **[claims](#claims)**
 
 - **[council](#council)**
+
+- **[csm](#csm)**
+
+- **[csmLocking](#csmlocking)**
 
 - **[democracy](#democracy)**
 
@@ -97,19 +99,6 @@ ___
 ___
 
 
-## benefits
- 
-### AddBenefitFundsSuccess(`AccountId`, `Balance`)
-- **interface**: `api.events.benefits.AddBenefitFundsSuccess.is`
-- **summary**:   Add benefit funds success. The first item is the account. The second item is the added benefit amount. 
- 
-### CutBenefitFundsSuccess(`AccountId`, `Balance`)
-- **interface**: `api.events.benefits.CutBenefitFundsSuccess.is`
-- **summary**:   Cut benefit funds success The first item is the account. The second item is the decreased benefit amount. 
-
-___
-
-
 ## bounties
  
 ### BountyAwarded(`BountyIndex`, `AccountId`)
@@ -170,6 +159,18 @@ ___
 - **interface**: `api.events.claims.Claimed.is`
 - **summary**:   Someone claimed some CRUs. [who, ethereum_address, amount] 
  
+### Cru18Claimed(`EthereumAddress`, `AccountId`, `Balance`)
+- **interface**: `api.events.claims.Cru18Claimed.is`
+- **summary**:   Someone claimed cru18 locked CRU18s, [who, ethereum_address, amount] 
+ 
+### Cru18MinerChanged(`AccountId`)
+- **interface**: `api.events.claims.Cru18MinerChanged.is`
+- **summary**:   Set new cru18 Miner 
+ 
+### Cru18MintSuccess(`EthereumAddress`, `Balance`)
+- **interface**: `api.events.claims.Cru18MintSuccess.is`
+- **summary**:   Mint new cru18 CRU18 pre claims 
+ 
 ### MinerChanged(`AccountId`)
 - **interface**: `api.events.claims.MinerChanged.is`
 - **summary**:   Someone be the new Miner 
@@ -218,6 +219,60 @@ ___
 ### Voted(`AccountId`, `Hash`, `bool`, `MemberCount`, `MemberCount`)
 - **interface**: `api.events.council.Voted.is`
 - **summary**:   A motion (given hash) has been voted on by given account, leaving a tally (yes votes and no votes given respectively as `MemberCount`). \[account, proposal_hash, voted, yes, no\] 
+
+___
+
+
+## csm
+ 
+### BalanceSet(`AccountId`, `Balance`, `Balance`)
+- **interface**: `api.events.csm.BalanceSet.is`
+- **summary**:   A balance was set by root. \[who, free, reserved\] 
+ 
+### Deposit(`AccountId`, `Balance`)
+- **interface**: `api.events.csm.Deposit.is`
+- **summary**:   Some amount was deposited (e.g. for transaction fees). \[who, deposit\] 
+ 
+### DustLost(`AccountId`, `Balance`)
+- **interface**: `api.events.csm.DustLost.is`
+- **summary**:   An account was removed whose balance was non-zero but below ExistentialDeposit, resulting in an outright loss. \[account, balance\] 
+ 
+### Endowed(`AccountId`, `Balance`)
+- **interface**: `api.events.csm.Endowed.is`
+- **summary**:   An account was created with some free balance. \[account, free_balance\] 
+ 
+### Reserved(`AccountId`, `Balance`)
+- **interface**: `api.events.csm.Reserved.is`
+- **summary**:   Some balance was reserved (moved from free to reserved). \[who, value\] 
+ 
+### ReserveRepatriated(`AccountId`, `AccountId`, `Balance`, `Status`)
+- **interface**: `api.events.csm.ReserveRepatriated.is`
+- **summary**:   Some balance was moved from the reserve of the first account to the second account. Final argument indicates the destination balance type. \[from, to, balance, destination_status\] 
+ 
+### Transfer(`AccountId`, `AccountId`, `Balance`)
+- **interface**: `api.events.csm.Transfer.is`
+- **summary**:   Transfer succeeded. \[from, to, value\] 
+ 
+### Unreserved(`AccountId`, `Balance`)
+- **interface**: `api.events.csm.Unreserved.is`
+- **summary**:   Some balance was unreserved (moved from reserved to free). \[who, value\] 
+
+___
+
+
+## csmLocking
+ 
+### Bonded(`AccountId`, `Balance`)
+- **interface**: `api.events.csmLocking.Bonded.is`
+- **summary**:   An account has bonded this amount. [stash, amount] 
+ 
+### Unbonded(`AccountId`, `Balance`)
+- **interface**: `api.events.csmLocking.Unbonded.is`
+- **summary**:   An account has unbonded this amount. [stash, amount] 
+ 
+### Withdrawn(`AccountId`, `Balance`)
+- **interface**: `api.events.csmLocking.Withdrawn.is`
+- **summary**:   An account has called `withdraw_unbonded` and removed unbonding chunks worth `Balance` from the unlocking queue. [stash, amount] 
 
 ___
 
@@ -434,47 +489,42 @@ ___
  
 ### AddCollateralSuccess(`AccountId`, `Balance`)
 - **interface**: `api.events.market.AddCollateralSuccess.is`
-- **summary**:   Add extra collateral for a merchant success. The first item is the account who is the merchant. The second item is the extra collateral amount of currency. 
  
 ### AddPrepaidSuccess(`AccountId`, `MerkleRoot`, `Balance`)
 - **interface**: `api.events.market.AddPrepaidSuccess.is`
-- **summary**:   Add prepaid value for an existed file success. The first item is the account who add the prepaid. The second item is the cid of the file. The third item is the prepaid amount of currency. 
  
 ### CalculateSuccess(`MerkleRoot`)
 - **interface**: `api.events.market.CalculateSuccess.is`
-- **summary**:   Calculate the reward for a file success. The first item is the cid of the file. 
  
 ### CutCollateralSuccess(`AccountId`, `Balance`)
 - **interface**: `api.events.market.CutCollateralSuccess.is`
-- **summary**:   Cut extra collateral for a merchant success. The first item is the account who is the merchant. The second item is the extra collateral amount of currency. 
  
 ### FileSuccess(`AccountId`, `MerkleRoot`)
 - **interface**: `api.events.market.FileSuccess.is`
-- **summary**:   Place a storage order success. The first item is the account who places the storage order. The second item is the cid of the file. 
  
 ### IllegalFileClosed(`MerkleRoot`)
 - **interface**: `api.events.market.IllegalFileClosed.is`
-- **summary**:   A file is closed due to mismatch file size. The first item is the cid of the file. 
+ 
+### PaysOrderSuccess(`AccountId`)
+- **interface**: `api.events.market.PaysOrderSuccess.is`
+ 
+### PotList(`AccountId`, `AccountId`, `AccountId`, `AccountId`)
+- **interface**: `api.events.market.PotList.is`
  
 ### RegisterSuccess(`AccountId`, `Balance`)
 - **interface**: `api.events.market.RegisterSuccess.is`
-- **summary**:   Register to be a merchant success. The first item is the account who want to register. The second item is the collateral amount of currency. 
  
 ### RenewFileSuccess(`AccountId`, `MerkleRoot`)
 - **interface**: `api.events.market.RenewFileSuccess.is`
-- **summary**:   Renew an existed file success. The first item is the account who renew the storage order. The second item is the cid of the file. 
  
 ### RewardMerchantSuccess(`AccountId`)
 - **interface**: `api.events.market.RewardMerchantSuccess.is`
-- **summary**:   Reward the merchant success. The first item is the account of the merchant. 
  
 ### SetBaseFeeSuccess(`Balance`)
 - **interface**: `api.events.market.SetBaseFeeSuccess.is`
-- **summary**:   Set the file base fee success. 
  
 ### SetMarketSwitchSuccess(`bool`)
 - **interface**: `api.events.market.SetMarketSwitchSuccess.is`
-- **summary**:   Set the global market switch success. 
 
 ___
 
@@ -526,10 +576,6 @@ ___
 - **interface**: `api.events.staking.ChillSuccess.is`
 - **summary**:   An account has been chilled from its stash 
  
-### CutGuaranteeSuccess(`AccountId`, `AccountId`, `Balance`)
-- **interface**: `api.events.staking.CutGuaranteeSuccess.is`
-- **summary**:   An account has called `cut_guarantee` and cut vote for one validator. 
- 
 ### EraReward(`EraIndex`, `Balance`, `Balance`)
 - **interface**: `api.events.staking.EraReward.is`
 - **summary**:   Total reward at each era 
@@ -545,6 +591,10 @@ ___
 ### OldSlashingReportDiscarded(`SessionIndex`)
 - **interface**: `api.events.staking.OldSlashingReportDiscarded.is`
 - **summary**:   An old slashing report from a prior era was discarded because it could not be processed. 
+ 
+### PotList(`AccountId`)
+- **interface**: `api.events.staking.PotList.is`
+- **summary**:   Staking pot address 
  
 ### Reward(`AccountId`, `Balance`)
 - **interface**: `api.events.staking.Reward.is`
@@ -594,39 +644,36 @@ ___
  
 ### ABUpgradeSuccess(`AccountId`, `SworkerPubKey`, `SworkerPubKey`)
 - **interface**: `api.events.swork.ABUpgradeSuccess.is`
-- **summary**:   AB upgrade success. The first item is the account who're doing AB upgrade. The second item is the pub key of the previous(A) sWorker. The third item is the pub key of the latest(B) sWorker. 
  
 ### CancelPunishmentSuccess(`AccountId`)
 - **interface**: `api.events.swork.CancelPunishmentSuccess.is`
-- **summary**:   Cancel the punishment success. 
+ 
+### ChillSuccess(`AccountId`, `SworkerPubKey`)
+- **interface**: `api.events.swork.ChillSuccess.is`
  
 ### CreateGroupSuccess(`AccountId`)
 - **interface**: `api.events.swork.CreateGroupSuccess.is`
-- **summary**:   Create the group success. The first item is the group owner's account. 
  
 ### JoinGroupSuccess(`AccountId`, `AccountId`)
 - **interface**: `api.events.swork.JoinGroupSuccess.is`
-- **summary**:   Join the group success. The first item is the member's account. The second item is the group owner's account. 
  
 ### KickOutSuccess(`AccountId`)
 - **interface**: `api.events.swork.KickOutSuccess.is`
-- **summary**:   Kick some one out of the group. The first item is the member's account. 
  
 ### QuitGroupSuccess(`AccountId`, `AccountId`)
 - **interface**: `api.events.swork.QuitGroupSuccess.is`
-- **summary**:   Quit the group success. The first item is the member's account. The second item is the group owner's account. 
  
 ### RegisterSuccess(`AccountId`, `SworkerPubKey`)
 - **interface**: `api.events.swork.RegisterSuccess.is`
-- **summary**:   sWorker registration success. The first item is the account who try to register. The second item is the pub key of the sWorker. 
  
 ### SetCodeSuccess(`SworkerCode`, `BlockNumber`)
 - **interface**: `api.events.swork.SetCodeSuccess.is`
-- **summary**:   Set code success. The first item is the enclave code. The second item is the expired block number. 
+ 
+### SetPunishmentSuccess(`bool`)
+- **interface**: `api.events.swork.SetPunishmentSuccess.is`
  
 ### WorksReportSuccess(`AccountId`, `SworkerPubKey`)
 - **interface**: `api.events.swork.WorksReportSuccess.is`
-- **summary**:   Send the work report success. The first item is the account who send the work report The second item is the pub key of the sWorker. 
 
 ___
 

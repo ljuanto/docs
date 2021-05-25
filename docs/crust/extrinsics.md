@@ -12,8 +12,6 @@ The following sections contain Extrinsics methods are part of the default Substr
 
 - **[balances](#balances)**
 
-- **[benefits](#benefits)**
-
 - **[bounties](#bounties)**
 
 - **[candy](#candy)**
@@ -21,6 +19,10 @@ The following sections contain Extrinsics methods are part of the default Substr
 - **[claims](#claims)**
 
 - **[council](#council)**
+
+- **[csm](#csm)**
+
+- **[csmLocking](#csmlocking)**
 
 - **[democracy](#democracy)**
 
@@ -119,19 +121,6 @@ ___
   99% of the time you want [`transfer`] instead. 
 
   [`transfer`]: struct.Pallet.html#method.transfer  
-
-___
-
-
-## benefits
- 
-### addBenefitFunds(value: `Compact<BalanceOf>`)
-- **interface**: `api.tx.benefits.addBenefitFunds`
-- **summary**:   Add benefit funds 
- 
-### cutBenefitFunds(value: `Compact<BalanceOf>`)
-- **interface**: `api.tx.benefits.cutBenefitFunds`
-- **summary**:   Cut benefit funds 
 
 ___
 
@@ -293,13 +282,39 @@ ___
 ### claim(dest: `AccountId`, tx: `EthereumTxHash`, sig: `EcdsaSignature`)
 - **interface**: `api.tx.claims.claim`
  
+### claimCru18(dest: `AccountId`, sig: `EcdsaSignature`)
+- **interface**: `api.tx.claims.claimCru18`
+- **summary**:   Make real cru18 claims, should judge the ethereum signature 
+ 
+### forceClaim(tx: `EthereumTxHash`)
+- **interface**: `api.tx.claims.forceClaim`
+- **summary**:   Force claim maxwell token for the 'dead' MINTED claims, this can only be called by `_ROOT_` And make sure this `tx` is minted, and this action won't cost claim limit. 
+ 
+### forceDeleteCru18Preclaim(address: `EthereumAddress`)
+- **interface**: `api.tx.claims.forceDeleteCru18Preclaim`
+- **summary**:   Force delete the 'dead' cru18 preclaim, this can only be called by `_ROOT_` origin And make sure this `address` DO NOT make any claim on cru18 before delete it. 
+ 
 ### mintClaim(tx: `EthereumTxHash`, who: `EthereumAddress`, value: `BalanceOf`)
 - **interface**: `api.tx.claims.mintClaim`
 - **summary**:   Mint the claim 
  
+### mintCru18Claim(address: `EthereumAddress`, amount: `BalanceOf`)
+- **interface**: `api.tx.claims.mintCru18Claim`
+- **summary**:   Mint the cru18 erc20 CRU18 locked token 
+ 
 ### setClaimLimit(limit: `BalanceOf`)
 - **interface**: `api.tx.claims.setClaimLimit`
 - **summary**:   Set claim limit 
+ 
+### setCru18Miner(new_cru18_miner: `LookupSource`)
+- **interface**: `api.tx.claims.setCru18Miner`
+- **summary**:   Sets cru18 miner 
+
+  The dispatch origin for this call must be _Root_. 
+
+  Parameters: 
+
+  - `new_cru18_miner`: The new cru18 miner's address, this is a cold pk needs to be offline
 
 ___
 
@@ -375,6 +390,74 @@ ___
   Requires the sender to be a member. 
 
   Transaction fees will be waived if the member is voting on any particular proposal for the first time and the call is successful. Subsequent vote changes will charge a fee.  
+
+___
+
+
+## csm
+ 
+### forceTransfer(source: `LookupSource`, dest: `LookupSource`, value: `Compact<Balance>`)
+- **interface**: `api.tx.csm.forceTransfer`
+- **summary**:   Exactly as `transfer`, except the origin must be root and the source account may be specified.  
+ 
+### setBalance(who: `LookupSource`, new_free: `Compact<Balance>`, new_reserved: `Compact<Balance>`)
+- **interface**: `api.tx.csm.setBalance`
+- **summary**:   Set the balances of a given account. 
+
+  This will alter `FreeBalance` and `ReservedBalance` in storage. it will also decrease the total issuance of the system (`TotalIssuance`). If the new free or reserved balance is below the existential deposit, it will reset the account nonce (`frame_system::AccountNonce`). 
+
+  The dispatch origin for this call is `root`. 
+
+   
+ 
+### transfer(dest: `LookupSource`, value: `Compact<Balance>`)
+- **interface**: `api.tx.csm.transfer`
+- **summary**:   Transfer some liquid free balance to another account. 
+
+  `transfer` will set the `FreeBalance` of the sender and receiver. It will decrease the total issuance of the system by the `TransferFee`. If the sender's account is below the existential deposit as a result of the transfer, the account will be reaped. 
+
+  The dispatch origin for this call must be `Signed` by the transactor. 
+
+   
+ 
+### transferKeepAlive(dest: `LookupSource`, value: `Compact<Balance>`)
+- **interface**: `api.tx.csm.transferKeepAlive`
+- **summary**:   Same as the [`transfer`] call, but with a check that the transfer will not kill the origin account. 
+
+  99% of the time you want [`transfer`] instead. 
+
+  [`transfer`]: struct.Pallet.html#method.transfer  
+
+___
+
+
+## csmLocking
+ 
+### bond(value: `Compact<BalanceOf>`)
+- **interface**: `api.tx.csmLocking.bond`
+- **summary**:   Lock some amount that have appeared in the account `free_balance` into the ledger 
+ 
+### forceUnstake(who: `AccountId`)
+- **interface**: `api.tx.csmLocking.forceUnstake`
+- **summary**:   Force a current account to become completely unstaked, immediately. 
+
+  The dispatch origin must be Root. 
+ 
+### rebond(value: `Compact<BalanceOf>`)
+- **interface**: `api.tx.csmLocking.rebond`
+- **summary**:   Rebond a portion of the account scheduled to be unlocked. 
+ 
+### unbond(value: `Compact<BalanceOf>`)
+- **interface**: `api.tx.csmLocking.unbond`
+- **summary**:   Schedule a portion of the account to be unlocked ready for transfer out after the bond period ends. If this leaves an amount actively bonded less than T::Currency::minimum_balance(), then it is increased to the full amount. 
+ 
+### withdrawUnbonded()
+- **interface**: `api.tx.csmLocking.withdrawUnbonded`
+- **summary**:   Remove any unlocked chunks from the `unlocking` queue from our management. 
+
+  This essentially frees up that balance to be used by the stash account to do whatever it wants. 
+
+  Emits `Withdrawn`. 
 
 ___
 
@@ -1067,37 +1150,37 @@ ___
  
 ### addCollateral(value: `Compact<BalanceOf>`)
 - **interface**: `api.tx.market.addCollateral`
-- **summary**:   Add extra collateral amount of currency to accept storage order. 
+- **summary**:   Collateral extra amount of currency to accept market order. 
 
    
  
 ### addPrepaid(cid: `MerkleRoot`, amount: `Compact<BalanceOf>`)
 - **interface**: `api.tx.market.addPrepaid`
-- **summary**:   Add prepaid amount of currency for this file. If this file has prepaid value and enough for a new storage order, it can be renewed by anyone. 
+- **summary**:   Place a storage order 
  
 ### calculateReward(cid: `MerkleRoot`)
 - **interface**: `api.tx.market.calculateReward`
-- **summary**:   Calculate the reward for a file 
+- **summary**:   Calculate the payout 
  
 ### cutCollateral(value: `Compact<BalanceOf>`)
 - **interface**: `api.tx.market.cutCollateral`
-- **summary**:   Decrease extra collateral amount of currency to accept storage order. 
+- **summary**:   Decrease collateral amount of currency for market order. 
 
    
  
 ### placeStorageOrder(cid: `MerkleRoot`, reported_file_size: `u64`, tips: `Compact<BalanceOf>`)
 - **interface**: `api.tx.market.placeStorageOrder`
-- **summary**:   Place a storage order. The cid and file_size of this file should be provided. Extra tips is accepted. 
+- **summary**:   Place a storage order 
  
 ### register(collateral: `Compact<BalanceOf>`)
 - **interface**: `api.tx.market.register`
-- **summary**:   Register to be a merchant. This will require you to collateral first, complexity depends on `Collaterals`(P). 
+- **summary**:   Register to be a merchant, you should provide your storage layer's address info this will require you to collateral first, complexity depends on `Collaterals`(P). 
 
    
  
 ### rewardMerchant()
 - **interface**: `api.tx.market.rewardMerchant`
-- **summary**:   Reward a merchant 
+- **summary**:   Reward the merchant 
  
 ### setBaseFee(base_fee: `Compact<BalanceOf>`)
 - **interface**: `api.tx.market.setBaseFee`
@@ -1106,6 +1189,9 @@ ___
 ### setMarketSwitch(is_enabled: `bool`)
 - **interface**: `api.tx.market.setMarketSwitch`
 - **summary**:   Set the global switch 
+ 
+### showPots()
+- **interface**: `api.tx.market.showPots`
 
 ___
 
@@ -1347,6 +1433,9 @@ ___
 
    
  
+### showPots()
+- **interface**: `api.tx.staking.showPots`
+ 
 ### unbond(value: `Compact<BalanceOf>`)
 - **interface**: `api.tx.staking.unbond`
 - **summary**:   Schedule a portion of the stash to be unlocked ready for transfer out after the bond period ends. If this leaves an amount actively bonded less than T::Currency::minimum_balance(), then it is increased to the full amount. 
@@ -1431,23 +1520,18 @@ ___
  
 ### cancelPunishment(target: `LookupSource`)
 - **interface**: `api.tx.swork.cancelPunishment`
-- **summary**:   Cancel punishment for a specific account. This can only be done by Root/Democracy. 
  
 ### createGroup()
 - **interface**: `api.tx.swork.createGroup`
-- **summary**:   Create a group. One account can only create one group once. 
  
 ### joinGroup(target: `LookupSource`)
 - **interface**: `api.tx.swork.joinGroup`
-- **summary**:   Join a group. The account should already report works once and cannot have any used value. The target must be a group owner. 
  
 ### kickOut(target: `LookupSource`)
 - **interface**: `api.tx.swork.kickOut`
-- **summary**:   Kick someone out of this group. 
  
 ### quitGroup()
 - **interface**: `api.tx.swork.quitGroup`
-- **summary**:   Quit a group. 
  
 ### register(ias_sig: `IASSig`, ias_cert: `SworkerCert`, applier: `AccountId`, isv_body: `ISVBody`, sig: `SworkerSignature`)
 - **interface**: `api.tx.swork.register`
@@ -1471,9 +1555,13 @@ ___
  
 ### setCode(new_code: `SworkerCode`, expire_block: `BlockNumber`)
 - **interface**: `api.tx.swork.setCode`
-- **summary**:   Set code for AB Upgrade, this should only be called by `root` origin Ruled by `sudo/democracy` 
+- **summary**:   AB Upgrade, this should only be called by `root` origin Ruled by `sudo/democracy` 
 
    
+ 
+### setPunishment(is_enabled: `bool`)
+- **interface**: `api.tx.swork.setPunishment`
+- **summary**:   Set the punishment flag 
 
 ___
 

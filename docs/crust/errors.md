@@ -10,8 +10,6 @@ This page lists the errors that can be encountered in the different modules.
 
 - **[balances](#balances)**
 
-- **[benefits](#benefits)**
-
 - **[bounties](#bounties)**
 
 - **[candy](#candy)**
@@ -19,6 +17,10 @@ This page lists the errors that can be encountered in the different modules.
 - **[claims](#claims)**
 
 - **[council](#council)**
+
+- **[cSm](#csm)**
+
+- **[cSmLocking](#csmlocking)**
 
 - **[democracy](#democracy)**
 
@@ -124,19 +126,6 @@ ___
 ___
 
 
-## benefits
- 
-### InsuffientBalance
-- **interface**: `api.errors.benefits.InsuffientBalance.is`
-- **summary**:   Don't have enough money 
- 
-### InvalidTarget
-- **interface**: `api.errors.benefits.InvalidTarget.is`
-- **summary**:   Don't have benefit records 
-
-___
-
-
 ## bounties
  
 ### InsufficientProposersBalance
@@ -232,6 +221,10 @@ ___
 ### SignerHasNoClaim
 - **interface**: `api.errors.claims.SignerHasNoClaim.is`
 - **summary**:   Ethereum address has no claims. 
+ 
+### SignerHasNoPreClaim
+- **interface**: `api.errors.claims.SignerHasNoPreClaim.is`
+- **summary**:   Ethereum address and token type has no pre claims. 
 
 ___
 
@@ -277,6 +270,64 @@ ___
 ### WrongProposalWeight
 - **interface**: `api.errors.council.WrongProposalWeight.is`
 - **summary**:   The given weight bound for the proposal was too low. 
+
+___
+
+
+## cSM
+ 
+### DeadAccount
+- **interface**: `api.errors.csm.DeadAccount.is`
+- **summary**:   Beneficiary account must pre-exist 
+ 
+### ExistentialDeposit
+- **interface**: `api.errors.csm.ExistentialDeposit.is`
+- **summary**:   Value too low to create account due to existential deposit 
+ 
+### ExistingVestingSchedule
+- **interface**: `api.errors.csm.ExistingVestingSchedule.is`
+- **summary**:   A vesting schedule already exists for this account 
+ 
+### InsufficientBalance
+- **interface**: `api.errors.csm.InsufficientBalance.is`
+- **summary**:   Balance too low to send value 
+ 
+### KeepAlive
+- **interface**: `api.errors.csm.KeepAlive.is`
+- **summary**:   Transfer/payment would kill account 
+ 
+### LiquidityRestrictions
+- **interface**: `api.errors.csm.LiquidityRestrictions.is`
+- **summary**:   Account liquidity restrictions prevent withdrawal 
+ 
+### Overflow
+- **interface**: `api.errors.csm.Overflow.is`
+- **summary**:   Got an overflow after adding 
+ 
+### VestingBalance
+- **interface**: `api.errors.csm.VestingBalance.is`
+- **summary**:   Vesting balance too high to send value 
+
+___
+
+
+## cSMLocking
+ 
+### InsufficientValue
+- **interface**: `api.errors.csmLocking.InsufficientValue.is`
+- **summary**:   Can not bond with value less than minimum balance. 
+ 
+### NoMoreChunks
+- **interface**: `api.errors.csmLocking.NoMoreChunks.is`
+- **summary**:   Can not schedule more unlock chunks. 
+ 
+### NotBonded
+- **interface**: `api.errors.csmLocking.NotBonded.is`
+- **summary**:   Not bonded. 
+ 
+### NoUnlockChunk
+- **interface**: `api.errors.csmLocking.NoUnlockChunk.is`
+- **summary**:   Can not rebond without unlocking chunks. 
 
 ___
 
@@ -618,47 +669,55 @@ ___
  
 ### AlreadyRegistered
 - **interface**: `api.errors.market.AlreadyRegistered.is`
-- **summary**:   Already registered before and cannot register again. 
+- **summary**:   Register before 
  
 ### FileNotExist
 - **interface**: `api.errors.market.FileNotExist.is`
-- **summary**:   The file does not exist. Please check the cid again. 
+- **summary**:   File does not exist 
  
 ### FileSizeNotCorrect
 - **interface**: `api.errors.market.FileSizeNotCorrect.is`
-- **summary**:   The file size is not correct. The same file is already on chain and the file size should be same. Please check the file size again. 
+- **summary**:   File size is not correct 
  
 ### FileTooLarge
 - **interface**: `api.errors.market.FileTooLarge.is`
-- **summary**:   The file is too large. Please check the MaximumFileSize value. 
+- **summary**:   File is too large 
  
 ### InsufficientCollateral
 - **interface**: `api.errors.market.InsufficientCollateral.is`
-- **summary**:   Don't have enough collateral to keep the reward. The collateral value of each merchant must be larger than his current reward. 
+- **summary**:   Don't have enough collateral 
  
 ### InsufficientCurrency
 - **interface**: `api.errors.market.InsufficientCurrency.is`
-- **summary**:   Don't have enough currency(CRU) to finish the extrinsic(transaction). Please transfer some CRU into this account. 
+- **summary**:   Don't have enough currency 
  
 ### InsufficientValue
 - **interface**: `api.errors.market.InsufficientValue.is`
-- **summary**:   Can not choose the value less than the minimum balance. Please increase the value to be larger than the minimu balance. 
+- **summary**:   Can not bond with value less than minimum balance. 
  
 ### NotEnoughReward
 - **interface**: `api.errors.market.NotEnoughReward.is`
-- **summary**:   The reward is not enough. 
+- **summary**:   Reward is not enough 
  
 ### NotInRewardPeriod
 - **interface**: `api.errors.market.NotInRewardPeriod.is`
-- **summary**:   The file is not in the reward period. Please wait until the file is expired. 
+- **summary**:   File is not in the reward period 
+ 
+### NotPermitted
+- **interface**: `api.errors.market.NotPermitted.is`
+- **summary**:   You are not permitted to this function You are not in the whitelist 
  
 ### NotRegister
 - **interface**: `api.errors.market.NotRegister.is`
-- **summary**:   Didn't register as a merchant before and cannot finish the extrinsic(transaction). Please register as a merchant first. 
+- **summary**:   Not Register before 
  
 ### PlaceOrderNotAvailable
 - **interface**: `api.errors.market.PlaceOrderNotAvailable.is`
-- **summary**:   Place order is not available right now. Please wait for a while. 
+- **summary**:   Place order is not available right now 
+ 
+### RewardLengthTooLong
+- **interface**: `api.errors.market.RewardLengthTooLong.is`
+- **summary**:   Reward length is too long 
 
 ___
 
@@ -797,17 +856,21 @@ ___
 - **interface**: `api.errors.swork.AlreadyJoint.is`
 - **summary**:   Already joint one group 
  
+### ExceedBondsLimit
+- **interface**: `api.errors.swork.ExceedBondsLimit.is`
+- **summary**:   Exceed the maximum bonding relation per account 
+ 
 ### ExceedGroupLimit
 - **interface**: `api.errors.swork.ExceedGroupLimit.is`
-- **summary**:   Exceed the limit of members number in one group. 
+- **summary**:   Exceed the limit of members number in one group 
  
 ### GroupAlreadyExist
 - **interface**: `api.errors.swork.GroupAlreadyExist.is`
-- **summary**:   The group already exist. 
+- **summary**:   Group already exist 
  
 ### GroupOwnerForbidden
 - **interface**: `api.errors.swork.GroupOwnerForbidden.is`
-- **summary**:   The group owner cannot be a sWorker member. 
+- **summary**:   Group owner cannot register 
  
 ### IdentityNotExist
 - **interface**: `api.errors.swork.IdentityNotExist.is`
@@ -825,13 +888,17 @@ ___
 - **interface**: `api.errors.swork.IllegalIdentity.is`
 - **summary**:   Identity check failed 
  
+### IllegalPubKey
+- **interface**: `api.errors.swork.IllegalPubKey.is`
+- **summary**:   Illegal pubkey 
+ 
 ### IllegalReporter
 - **interface**: `api.errors.swork.IllegalReporter.is`
 - **summary**:   Illegal reporter 
  
 ### IllegalUsed
 - **interface**: `api.errors.swork.IllegalUsed.is`
-- **summary**:   The used value is not zero and cannot join a group. 
+- **summary**:   Used is not zero, 
  
 ### IllegalWorkReportSig
 - **interface**: `api.errors.swork.IllegalWorkReportSig.is`
@@ -839,7 +906,7 @@ ___
  
 ### InvalidExpiredBlock
 - **interface**: `api.errors.swork.InvalidExpiredBlock.is`
-- **summary**:   Cannot extend the valid duration for an existed enclave code. 
+- **summary**:   Expired block cannot be decreased 
  
 ### InvalidReportTime
 - **interface**: `api.errors.swork.InvalidReportTime.is`
@@ -847,11 +914,11 @@ ___
  
 ### NotJoint
 - **interface**: `api.errors.swork.NotJoint.is`
-- **summary**:   The member is not in this group and cannot quit. 
+- **summary**:   Member is not in a group 
  
 ### NotOwner
 - **interface**: `api.errors.swork.NotOwner.is`
-- **summary**:   The target is not a group owner. Please make sure that the target is a group owner. 
+- **summary**:   Not a owner, 
  
 ### OutdatedReporter
 - **interface**: `api.errors.swork.OutdatedReporter.is`

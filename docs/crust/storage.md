@@ -12,8 +12,6 @@ The following sections contain Storage methods are part of the default Substrate
 
 - **[balances](#balances)**
 
-- **[benefits](#benefits)**
-
 - **[bounties](#bounties)**
 
 - **[candy](#candy)**
@@ -21,6 +19,10 @@ The following sections contain Storage methods are part of the default Substrate
 - **[claims](#claims)**
 
 - **[council](#council)**
+
+- **[cSm](#csm)**
+
+- **[cSmLocking](#csmlocking)**
 
 - **[democracy](#democracy)**
 
@@ -179,19 +181,6 @@ ___
 ___
 
 
-## benefits
- 
-### currentBenefits(): `EraBenefits`
-- **interface**: `api.query.benefits.currentBenefits`
-- **summary**:   The global benefits information 
- 
-### feeReductionBenefits(`AccountId`): `FeeReductionBenefit`
-- **interface**: `api.query.benefits.feeReductionBenefits`
-- **summary**:   The fee reduction 
-
-___
-
-
 ## bounties
  
 ### bounties(`BountyIndex`): `Option<Bounty>`
@@ -233,18 +222,43 @@ ___
  
 ### claimed(`EthereumTxHash`): `bool`
 - **interface**: `api.query.claims.claimed`
+- **summary**:   If `Claims(EthereumTxHash)` already been claimed, prevent double claim. 
  
 ### claimLimit(): `BalanceOf`
 - **interface**: `api.query.claims.claimLimit`
+- **summary**:   Claim limit deciding how much CRUPV can be mint. 
  
 ### claims(`EthereumTxHash`): `Option<(EthereumAddress,BalanceOf)>`
 - **interface**: `api.query.claims.claims`
+- **summary**:   Mapping with [EthereumTxHash: (EthereumAddress, TokenAmount)], mining by `Miner`. 
+ 
+### cru18Claimed(`EthereumAddress`): `bool`
+- **interface**: `api.query.claims.cru18Claimed`
+- **summary**:   If `Cru18Tokens(EthereumAddress)` already been claimed, prevent double claim. 
+ 
+### cru18Claims(`EthereumAddress, AccountId`): `Option<BalanceOf>`
+- **interface**: `api.query.claims.cru18Claims`
+- **summary**:   CRU18 claims information with [EthereumAddress, Cru18PubKey]. 
+ 
+### cru18Miner(): `Option<AccountId>`
+- **interface**: `api.query.claims.cru18Miner`
+- **summary**:   Cru18 miner set by sudo. 
+ 
+### cru18PreClaims(`EthereumAddress`): `Option<BalanceOf>`
+- **interface**: `api.query.claims.cru18PreClaims`
+- **summary**:   ERC20 CRU18 locked tokens, to be claimed information. 
+ 
+### cru18TotalClaimed(): `BalanceOf`
+- **interface**: `api.query.claims.cru18TotalClaimed`
+- **summary**:   Claimed CRU18 locked tokens. 
  
 ### miner(): `Option<AccountId>`
 - **interface**: `api.query.claims.miner`
+- **summary**:   Maxwell miner set by sudo. 
  
 ### superior(): `Option<AccountId>`
 - **interface**: `api.query.claims.superior`
+- **summary**:   Controlling the CRUPV claim limit, set by sudo. 
 
 ___
 
@@ -274,6 +288,40 @@ ___
 ### voting(`Hash`): `Option<Votes>`
 - **interface**: `api.query.council.voting`
 - **summary**:   Votes on a given proposal, if it is ongoing. 
+
+___
+
+
+## cSM
+ 
+### account(`AccountId`): `AccountData`
+- **interface**: `api.query.cSM.account`
+- **summary**:   The balance of an account. 
+
+  NOTE: This is only used in the case that this pallet is used to store balances. 
+ 
+### locks(`AccountId`): `Vec<BalanceLock>`
+- **interface**: `api.query.cSM.locks`
+- **summary**:   Any liquidity locks on some account balances. NOTE: Should only be accessed when setting, changing and freeing a lock. 
+ 
+### storageVersion(): `Releases`
+- **interface**: `api.query.cSM.storageVersion`
+- **summary**:   Storage version of the pallet. 
+
+  This is set to v2.0.0 for new networks. 
+ 
+### totalIssuance(): `Balance`
+- **interface**: `api.query.cSM.totalIssuance`
+- **summary**:   The total units issued in the system. 
+
+___
+
+
+## cSMLocking
+ 
+### ledger(`AccountId`): `CSMLedger`
+- **interface**: `api.query.cSMLocking.ledger`
+- **summary**:   Map from all (unlocked) "controller" accounts to the info regarding the CSM. 
 
 ___
 
@@ -484,51 +532,46 @@ ___
  
 ### fileBaseFee(): `BalanceOf`
 - **interface**: `api.query.market.fileBaseFee`
-- **summary**:   The file base fee for each storage order. 
+- **summary**:   File Base Fee. 
  
 ### filePrice(): `BalanceOf`
 - **interface**: `api.query.market.filePrice`
-- **summary**:   The file price per MB. It's dynamically adjusted and would change according to FilesSize, TotalCapacity and StorageReferenceRatio. 
+- **summary**:   File price. It would change according to First Party Storage, Total Storage and Storage Base Ratio. 
  
 ### files(`MerkleRoot`): `Option<(FileInfo,UsedInfo)>`
 - **interface**: `api.query.market.files`
-- **summary**:   The file information and used information iterated by ipfs cid. It includes file related info such as file size, expired date and reported replica count. 
+- **summary**:   File information iterated by order id 
  
 ### filesSize(): `u128`
 - **interface**: `api.query.market.filesSize`
-- **summary**:   The total files size in Byte. 
+- **summary**:   First Class Storage 
  
 ### marketSwitch(): `bool`
 - **interface**: `api.query.market.marketSwitch`
-- **summary**:   The global market switch to enable place storage order 
+- **summary**:   Market switch to enable place storage order 
  
 ### merchantLedgers(`AccountId`): `MerchantLedger`
 - **interface**: `api.query.market.merchantLedgers`
-- **summary**:   The merchant ledger, which contains the collateral and reward value for each merchant. 
+- **summary**:   Merchant Ledger 
  
 ### usedTrashI(`MerkleRoot`): `Option<UsedInfo>`
 - **interface**: `api.query.market.usedTrashI`
-- **summary**:   The first file trash to store overdue files for a while 
+- **summary**:   File trash to store second class storage 
  
 ### usedTrashII(`MerkleRoot`): `Option<UsedInfo>`
 - **interface**: `api.query.market.usedTrashII`
-- **summary**:   The second file trash to store overdue files for a while 
  
 ### usedTrashMappingI(`SworkerAnchor`): `u64`
 - **interface**: `api.query.market.usedTrashMappingI`
-- **summary**:   The total counted used size for each anchor in the first file trash 
  
 ### usedTrashMappingII(`SworkerAnchor`): `u64`
 - **interface**: `api.query.market.usedTrashMappingII`
-- **summary**:   The total counted used size for each anchor in the second file trash 
  
 ### usedTrashSizeI(): `u128`
 - **interface**: `api.query.market.usedTrashSizeI`
-- **summary**:   The count of overdue files in the first file trash 
  
 ### usedTrashSizeII(): `u128`
 - **interface**: `api.query.market.usedTrashSizeII`
-- **summary**:   The count of overdue files in the second file trash 
 
 ___
 
@@ -824,11 +867,15 @@ ___
  
 ### currentReportSlot(): `ReportSlot`
 - **interface**: `api.query.swork.currentReportSlot`
-- **summary**:   The current report slot block number, this value should be a multiple of report slot block. 
+- **summary**:   The current report slot block number, this value should be a multiple of era block 
+ 
+### enablePunishment(): `bool`
+- **interface**: `api.query.swork.enablePunishment`
+- **summary**:   Enable punishment, the default behavior will have punishment. 
  
 ### free(): `u128`
 - **interface**: `api.query.swork.free`
-- **summary**:   The free workload, used for calculating stake limit in the end of each report slot. The default value is 0. 
+- **summary**:   The free workload, used for calculating stake limit in the end of era default is 0 
  
 ### groups(`AccountId`): `BTreeSet<AccountId>`
 - **interface**: `api.query.swork.groups`
@@ -836,31 +883,30 @@ ___
  
 ### historySlotDepth(): `ReportSlot`
 - **interface**: `api.query.swork.historySlotDepth`
-- **summary**:   The depth of the history of the ReportedInSlot 
  
 ### identities(`AccountId`): `Option<Identity>`
 - **interface**: `api.query.swork.identities`
-- **summary**:   The identity information for each sworker member, which contains the anchor, punishment deadline and group information. 
+- **summary**:   The bond relationship between AccountId <-> Identity 
  
 ### pubKeys(`SworkerPubKey`): `PKInfo`
 - **interface**: `api.query.swork.pubKeys`
-- **summary**:   The pub key information, mapping from sWorker public key to an pubkey information, including the sworker enclave code and option anchor. 
+- **summary**:   The sWorker information, mapping from sWorker public key to an optional pubkey information 
  
 ### reportedFilesSize(): `u128`
 - **interface**: `api.query.swork.reportedFilesSize`
-- **summary**:   The total reported files workload, used for calculating total_capacity for market module The default value is 0. 
+- **summary**:   The total reported files workload, used for calculating total_capacity for market module default is 0 
  
 ### reportedInSlot(`SworkerAnchor, ReportSlot`): `bool`
 - **interface**: `api.query.swork.reportedInSlot`
-- **summary**:   Recording whether the validator reported works of each report slot. We keep the last "HistorySlotDepth" length data cause B-tree won't build index on key2(ReportSlot). The value represent if reported in this slot 
+- **summary**:   Recording whether the validator reported works of each era We leave it keep all era's report info cause B-tree won't build index on key2(ReportSlot) value represent if reported in this slot TODO: reverse the keys when we launch mainnet 
  
 ### used(): `u128`
 - **interface**: `api.query.swork.used`
-- **summary**:   The used workload, used for calculating stake limit in the end of each report slot. The default value is 0. 
+- **summary**:   The used workload, used for calculating stake limit in the end of era default is 0 
  
 ### workReports(`SworkerAnchor`): `Option<WorkReport>`
 - **interface**: `api.query.swork.workReports`
-- **summary**:   Node's work report, mapping from sWorker anchor to an optional work report. WorkReport only been replaced, it won't get removed cause we need to check the status transition from off-chain sWorker 
+- **summary**:   Node's work report, mapping from sWorker anchor to an optional work report WorkReport only been replaced, it won't get removed cause we need to check the status transition from off-chain sWorker 
 
 ___
 

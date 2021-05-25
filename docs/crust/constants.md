@@ -14,6 +14,10 @@ The following sections contain the module constants, also known as parameter typ
 
 - **[claims](#claims)**
 
+- **[cSm](#csm)**
+
+- **[cSmLocking](#csmlocking)**
+
 - **[democracy](#democracy)**
 
 - **[elections](#elections)**
@@ -102,6 +106,24 @@ ___
 ### prefix: `Bytes`
 - **interface**: `api.consts.claims.prefix`
 - **summary**:   The Prefix that is used in signed Ethereum messages for this network 
+
+___
+
+
+## cSM
+ 
+### existentialDeposit: `Balance`
+- **interface**: `api.consts.cSM.existentialDeposit`
+- **summary**:   The minimum amount required to keep an account open. 
+
+___
+
+
+## cSMLocking
+ 
+### bondingDuration: `BlockNumber`
+- **interface**: `api.consts.cSMLocking.bondingDuration`
+- **summary**:   Number of block number that locked funds must remain bonded for. 
 
 ___
 
@@ -213,19 +235,19 @@ ___
  
 ### fileDuration: `BlockNumber`
 - **interface**: `api.consts.market.fileDuration`
-- **summary**:   The file duration. 
+- **summary**:   File duration. 
  
 ### fileInitPrice: `BalanceOf`
 - **interface**: `api.consts.market.fileInitPrice`
-- **summary**:   The file init price after the chain start. 
+- **summary**:   File Init Price. 
  
 ### fileReplica: `u32`
 - **interface**: `api.consts.market.fileReplica`
-- **summary**:   The file base replica to get reward. 
+- **summary**:   File base replica. 
  
 ### maximumFileSize: `u64`
 - **interface**: `api.consts.market.maximumFileSize`
-- **summary**:   The max file size of a file 
+- **summary**:   Max size of a file 
  
 ### moduleId: `ModuleId`
 - **interface**: `api.consts.market.moduleId`
@@ -233,31 +255,31 @@ ___
  
 ### renewRewardRatio: `Perbill`
 - **interface**: `api.consts.market.renewRewardRatio`
-- **summary**:   The renew reward ratio for liquidator. 
+- **summary**:   Renew reward ratio. 
  
 ### stakingRatio: `Perbill`
 - **interface**: `api.consts.market.stakingRatio`
-- **summary**:   The staking ratio for how much CRU into staking pot. 
+- **summary**:   Storage / Staking ratio. 
  
 ### storageDecreaseRatio: `Perbill`
 - **interface**: `api.consts.market.storageDecreaseRatio`
-- **summary**:   The storage decrease ratio for each file price change. 
+- **summary**:   Storage decrease ratio. 
  
 ### storageIncreaseRatio: `Perbill`
 - **interface**: `api.consts.market.storageIncreaseRatio`
-- **summary**:   The storage increase ratio for each file price change. 
+- **summary**:   Storage increase ratio. 
  
 ### storageRatio: `Perbill`
 - **interface**: `api.consts.market.storageRatio`
-- **summary**:   The storage ratio for how much CRU into storage pot. 
+- **summary**:   Tax / Storage plus Staking ratio. 
  
 ### storageReferenceRatio: `(u128,u128)`
 - **interface**: `api.consts.market.storageReferenceRatio`
-- **summary**:   The storage reference ratio to adjust the file price. 
+- **summary**:   Storage reference ratio. files_size / total_capacity 
  
 ### usedTrashMaxSize: `u128`
 - **interface**: `api.consts.market.usedTrashMaxSize`
-- **summary**:   The max size of used trash. 
+- **summary**:   Max size of used trash. 
 
 ___
 
@@ -307,11 +329,11 @@ ___
  
 ### maxGroupSize: `u32`
 - **interface**: `api.consts.swork.maxGroupSize`
-- **summary**:   The max number of members in one group 
+- **summary**:   Max number of members in one group 
  
 ### punishmentSlots: `u32`
 - **interface**: `api.consts.swork.punishmentSlots`
-- **summary**:   The punishment duration if someone offline 
+- **summary**:   Punishment duration if someone offline 
 
 ___
 
