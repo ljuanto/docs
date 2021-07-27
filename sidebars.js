@@ -59,6 +59,15 @@ module.exports = {
       'crust/events',
       'crust/errors'
     ],
+    'Maxwell Metadata': [
+      'maxwell/intro',
+      'maxwell/rpc',
+      'maxwell/constants',
+      'maxwell/storage',
+      'maxwell/extrinsics',
+      'maxwell/events',
+      'maxwell/errors'
+    ],
     Keyring: [
       'keyring/intro',
       {

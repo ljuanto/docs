@@ -14,7 +14,17 @@ The following sections contain Storage methods are part of the default Substrate
 
 - **[benefits](#benefits)**
 
+- **[bounties](#bounties)**
+
+- **[candy](#candy)**
+
 - **[claims](#claims)**
+
+- **[council](#council)**
+
+- **[democracy](#democracy)**
+
+- **[elections](#elections)**
 
 - **[grandpa](#grandpa)**
 
@@ -24,11 +34,7 @@ The following sections contain Storage methods are part of the default Substrate
 
 - **[indices](#indices)**
 
-- **[locks](#locks)**
-
 - **[market](#market)**
-
-- **[multisig](#multisig)**
 
 - **[offences](#offences)**
 
@@ -48,7 +54,13 @@ The following sections contain Storage methods are part of the default Substrate
 
 - **[system](#system)**
 
+- **[technicalCommittee](#technicalcommittee)**
+
+- **[technicalMembership](#technicalmembership)**
+
 - **[timestamp](#timestamp)**
+
+- **[tips](#tips)**
 
 - **[transactionPayment](#transactionpayment)**
 
@@ -173,38 +185,205 @@ ___
 - **interface**: `api.query.benefits.currentBenefits`
 - **summary**:   The global benefits information 
  
-### marketBenefits(`AccountId`): `MarketBenefit`
-- **interface**: `api.query.benefits.marketBenefits`
-- **summary**:   The market benefit 
+### feeReductionBenefits(`AccountId`): `FeeReductionBenefit`
+- **interface**: `api.query.benefits.feeReductionBenefits`
+- **summary**:   The fee reduction 
+
+___
+
+
+## bounties
  
-### sworkBenefits(`AccountId`): `SworkBenefit`
-- **interface**: `api.query.benefits.sworkBenefits`
-- **summary**:   The sworker benefit 
+### bounties(`BountyIndex`): `Option<Bounty>`
+- **interface**: `api.query.bounties.bounties`
+- **summary**:   Bounties that have been made. 
+ 
+### bountyApprovals(): `Vec<BountyIndex>`
+- **interface**: `api.query.bounties.bountyApprovals`
+- **summary**:   Bounty indices that have been approved but not yet funded. 
+ 
+### bountyCount(): `BountyIndex`
+- **interface**: `api.query.bounties.bountyCount`
+- **summary**:   Number of bounty proposals that have been made. 
+ 
+### bountyDescriptions(`BountyIndex`): `Option<Bytes>`
+- **interface**: `api.query.bounties.bountyDescriptions`
+- **summary**:   The description of each bounty. 
+
+___
+
+
+## candy
+ 
+### balances(`AccountId`): `Balance`
+- **interface**: `api.query.candy.balances`
+- **summary**:   The number of units of candy held by any given account. 
+ 
+### total(): `Balance`
+- **interface**: `api.query.candy.total`
+- **summary**:   The total unit supply of candy. 
 
 ___
 
 
 ## claims
  
+### bondedEth(`AccountId`): `Option<EthereumAddress>`
+- **interface**: `api.query.claims.bondedEth`
+ 
 ### claimed(`EthereumTxHash`): `bool`
 - **interface**: `api.query.claims.claimed`
-- **summary**:   Mark if the claim transaction has already been claimed 
  
 ### claimLimit(): `BalanceOf`
 - **interface**: `api.query.claims.claimLimit`
-- **summary**:   Claim limit determinate how many CRUs can be claimed 
  
 ### claims(`EthereumTxHash`): `Option<(EthereumAddress,BalanceOf)>`
 - **interface**: `api.query.claims.claims`
-- **summary**:   The claim transaction mapping relationship in ethereum 
  
 ### miner(): `Option<AccountId>`
 - **interface**: `api.query.claims.miner`
-- **summary**:   [who] can mint the claims 
  
 ### superior(): `Option<AccountId>`
 - **interface**: `api.query.claims.superior`
-- **summary**:   [who] can set the claim limit 
+
+___
+
+
+## council
+ 
+### members(): `Vec<AccountId>`
+- **interface**: `api.query.council.members`
+- **summary**:   The current members of the collective. This is stored sorted (just by value). 
+ 
+### prime(): `Option<AccountId>`
+- **interface**: `api.query.council.prime`
+- **summary**:   The prime member that helps determine the default vote behavior in case of absentations. 
+ 
+### proposalCount(): `u32`
+- **interface**: `api.query.council.proposalCount`
+- **summary**:   Proposals so far. 
+ 
+### proposalOf(`Hash`): `Option<Proposal>`
+- **interface**: `api.query.council.proposalOf`
+- **summary**:   Actual proposal for a given hash, if it's current. 
+ 
+### proposals(): `Vec<Hash>`
+- **interface**: `api.query.council.proposals`
+- **summary**:   The hashes of the active proposals. 
+ 
+### voting(`Hash`): `Option<Votes>`
+- **interface**: `api.query.council.voting`
+- **summary**:   Votes on a given proposal, if it is ongoing. 
+
+___
+
+
+## democracy
+ 
+### blacklist(`Hash`): `Option<(BlockNumber,Vec<AccountId>)>`
+- **interface**: `api.query.democracy.blacklist`
+- **summary**:   A record of who vetoed what. Maps proposal hash to a possible existent block number (until when it may not be resubmitted) and who vetoed it. 
+ 
+### cancellations(`Hash`): `bool`
+- **interface**: `api.query.democracy.cancellations`
+- **summary**:   Record of all proposals that have been subject to emergency cancellation. 
+ 
+### depositOf(`PropIndex`): `Option<(Vec<AccountId>,BalanceOf)>`
+- **interface**: `api.query.democracy.depositOf`
+- **summary**:   Those who have locked a deposit. 
+
+  TWOX-NOTE: Safe, as increasing integer keys are safe. 
+ 
+### lastTabledWasExternal(): `bool`
+- **interface**: `api.query.democracy.lastTabledWasExternal`
+- **summary**:   True if the last referendum tabled was submitted externally. False if it was a public proposal. 
+ 
+### locks(`AccountId`): `Option<BlockNumber>`
+- **interface**: `api.query.democracy.locks`
+- **summary**:   Accounts for which there are locks in action which may be removed at some point in the future. The value is the block number at which the lock expires and may be removed. 
+
+  TWOX-NOTE: OK ― `AccountId` is a secure hash. 
+ 
+### lowestUnbaked(): `ReferendumIndex`
+- **interface**: `api.query.democracy.lowestUnbaked`
+- **summary**:   The lowest referendum index representing an unbaked referendum. Equal to `ReferendumCount` if there isn't a unbaked referendum. 
+ 
+### nextExternal(): `Option<(Hash,VoteThreshold)>`
+- **interface**: `api.query.democracy.nextExternal`
+- **summary**:   The referendum to be tabled whenever it would be valid to table an external proposal. This happens when a referendum needs to be tabled and one of two conditions are met: 
+
+  - `LastTabledWasExternal` is `false`; or
+
+  - `PublicProps` is empty.
+ 
+### preimages(`Hash`): `Option<PreimageStatus>`
+- **interface**: `api.query.democracy.preimages`
+- **summary**:   Map of hashes to the proposal preimage, along with who registered it and their deposit. The block number is the block at which it was deposited. 
+ 
+### publicPropCount(): `PropIndex`
+- **interface**: `api.query.democracy.publicPropCount`
+- **summary**:   The number of (public) proposals that have been made so far. 
+ 
+### publicProps(): `Vec<(PropIndex,Hash,AccountId)>`
+- **interface**: `api.query.democracy.publicProps`
+- **summary**:   The public proposals. Unsorted. The second item is the proposal's hash. 
+ 
+### referendumCount(): `ReferendumIndex`
+- **interface**: `api.query.democracy.referendumCount`
+- **summary**:   The next free referendum index, aka the number of referenda started so far. 
+ 
+### referendumInfoOf(`ReferendumIndex`): `Option<ReferendumInfo>`
+- **interface**: `api.query.democracy.referendumInfoOf`
+- **summary**:   Information concerning any given referendum. 
+
+  TWOX-NOTE: SAFE as indexes are not under an attacker’s control. 
+ 
+### storageVersion(): `Option<Releases>`
+- **interface**: `api.query.democracy.storageVersion`
+- **summary**:   Storage version of the pallet. 
+
+  New networks start with last version. 
+ 
+### votingOf(`AccountId`): `Voting`
+- **interface**: `api.query.democracy.votingOf`
+- **summary**:   All votes for a particular voter. We store the balance for the number of votes that we have recorded. The second item is the total amount of delegations, that will be added. 
+
+  TWOX-NOTE: SAFE as `AccountId`s are crypto hashes anyway. 
+
+___
+
+
+## elections
+ 
+### candidates(): `Vec<(AccountId,BalanceOf)>`
+- **interface**: `api.query.elections.candidates`
+- **summary**:   The present candidate list. A current member or runner-up can never enter this vector and is always implicitly assumed to be a candidate. 
+
+  Second element is the deposit. 
+
+  Invariant: Always sorted based on account id. 
+ 
+### electionRounds(): `u32`
+- **interface**: `api.query.elections.electionRounds`
+- **summary**:   The total number of vote rounds that have happened, excluding the upcoming one. 
+ 
+### members(): `Vec<SeatHolder>`
+- **interface**: `api.query.elections.members`
+- **summary**:   The current elected members. 
+
+  Invariant: Always sorted based on account id. 
+ 
+### runnersUp(): `Vec<SeatHolder>`
+- **interface**: `api.query.elections.runnersUp`
+- **summary**:   The current reserved runners-up. 
+
+  Invariant: Always sorted based on rank (worse to best). Upon removal of a member, the last (i.e. _best_) runner-up will be replaced. 
+ 
+### voting(`AccountId`): `Voter`
+- **interface**: `api.query.elections.voting`
+- **summary**:   Votes and locked stake of a particular voter. 
+
+  TWOX-NOTE: SAFE as `AccountId` is a crypto hash. 
 
 ___
 
@@ -301,70 +480,55 @@ ___
 ___
 
 
-## locks
- 
-### locks(`AccountId`): `Option<Lock>`
-- **interface**: `api.query.locks.locks`
- 
-### unlockFrom(): `Option<BlockNumber>`
-- **interface**: `api.query.locks.unlockFrom`
-
-___
-
-
 ## market
- 
-### enableMarket(): `bool`
-- **interface**: `api.query.market.enableMarket`
-- **summary**:   The global market switch to enable place storage order service 
  
 ### fileBaseFee(): `BalanceOf`
 - **interface**: `api.query.market.fileBaseFee`
 - **summary**:   The file base fee for each storage order. 
  
-### fileByteFee(): `BalanceOf`
-- **interface**: `api.query.market.fileByteFee`
+### filePrice(): `BalanceOf`
+- **interface**: `api.query.market.filePrice`
 - **summary**:   The file price per MB. It's dynamically adjusted and would change according to FilesSize, TotalCapacity and StorageReferenceRatio. 
  
-### fileKeysCount(): `u32`
-- **interface**: `api.query.market.fileKeysCount`
-- **summary**:   Files count, determinate the FileKeysCountFee 
- 
-### fileKeysCountFee(): `BalanceOf`
-- **interface**: `api.query.market.fileKeysCountFee`
-- **summary**:   The file price by keys It's dynamically adjusted and would change according to the total keys in files 
- 
-### files(`MerkleRoot`): `Option<FileInfo>`
+### files(`MerkleRoot`): `Option<(FileInfo,UsedInfo)>`
 - **interface**: `api.query.market.files`
-- **summary**:   File information iterated by order id 
+- **summary**:   The file information and used information iterated by ipfs cid. It includes file related info such as file size, expired date and reported replica count. 
  
-### hasNewOrder(): `bool`
-- **interface**: `api.query.market.hasNewOrder`
-- **summary**:   Has new order in the past blocks, pruning handling of pending files 
+### filesSize(): `u128`
+- **interface**: `api.query.market.filesSize`
+- **summary**:   The total files size in Byte. 
  
-### ordersCount(): `u32`
-- **interface**: `api.query.market.ordersCount`
-- **summary**:   New orders count in the past one period(one hour), determinate the FileBaseFee 
+### marketSwitch(): `bool`
+- **interface**: `api.query.market.marketSwitch`
+- **summary**:   The global market switch to enable place storage order 
  
-### pendingFiles(): `BTreeSet<MerkleRoot>`
-- **interface**: `api.query.market.pendingFiles`
-- **summary**:   Wait for updating storage power for all replicas 
+### merchantLedgers(`AccountId`): `MerchantLedger`
+- **interface**: `api.query.market.merchantLedgers`
+- **summary**:   The merchant ledger, which contains the collateral and reward value for each merchant. 
  
-### spowerReadyPeriod(): `BlockNumber`
-- **interface**: `api.query.market.spowerReadyPeriod`
-- **summary**:   The sPower will become valid after this period, default is 3 months 
-
-___
-
-
-## multisig
+### usedTrashI(`MerkleRoot`): `Option<UsedInfo>`
+- **interface**: `api.query.market.usedTrashI`
+- **summary**:   The first file trash to store overdue files for a while 
  
-### calls(`[u8;32]`): `Option<(OpaqueCall,AccountId,BalanceOf)>`
-- **interface**: `api.query.multisig.calls`
+### usedTrashII(`MerkleRoot`): `Option<UsedInfo>`
+- **interface**: `api.query.market.usedTrashII`
+- **summary**:   The second file trash to store overdue files for a while 
  
-### multisigs(`AccountId, [u8;32]`): `Option<Multisig>`
-- **interface**: `api.query.multisig.multisigs`
-- **summary**:   The set of open multisig operations. 
+### usedTrashMappingI(`SworkerAnchor`): `u64`
+- **interface**: `api.query.market.usedTrashMappingI`
+- **summary**:   The total counted used size for each anchor in the first file trash 
+ 
+### usedTrashMappingII(`SworkerAnchor`): `u64`
+- **interface**: `api.query.market.usedTrashMappingII`
+- **summary**:   The total counted used size for each anchor in the second file trash 
+ 
+### usedTrashSizeI(): `u128`
+- **interface**: `api.query.market.usedTrashSizeI`
+- **summary**:   The count of overdue files in the first file trash 
+ 
+### usedTrashSizeII(): `u128`
+- **interface**: `api.query.market.usedTrashSizeII`
+- **summary**:   The count of overdue files in the second file trash 
 
 ___
 
@@ -654,10 +818,6 @@ ___
 
 ## swork
  
-### addedFilesCount(): `u32`
-- **interface**: `api.query.swork.addedFilesCount`
-- **summary**:   Added files count in the past one period(one hour) 
- 
 ### codes(`SworkerCode`): `Option<BlockNumber>`
 - **interface**: `api.query.swork.codes`
 - **summary**:   The sWorker enclave codes, this should be managed by sudo/democracy 
@@ -666,15 +826,11 @@ ___
 - **interface**: `api.query.swork.currentReportSlot`
 - **summary**:   The current report slot block number, this value should be a multiple of report slot block. 
  
-### enablePunishment(): `bool`
-- **interface**: `api.query.swork.enablePunishment`
-- **summary**:   Enable punishment, the default behavior will have punishment. 
- 
 ### free(): `u128`
 - **interface**: `api.query.swork.free`
 - **summary**:   The free workload, used for calculating stake limit in the end of each report slot. The default value is 0. 
  
-### groups(`AccountId`): `Group`
+### groups(`AccountId`): `BTreeSet<AccountId>`
 - **interface**: `api.query.swork.groups`
 - **summary**:   The group information 
  
@@ -685,10 +841,6 @@ ___
 ### identities(`AccountId`): `Option<Identity>`
 - **interface**: `api.query.swork.identities`
 - **summary**:   The identity information for each sworker member, which contains the anchor, punishment deadline and group information. 
- 
-### identityPreviousKey(): `Option<Bytes>`
-- **interface**: `api.query.swork.identityPreviousKey`
-- **summary**:   The previous key spower to iterate identities 
  
 ### pubKeys(`SworkerPubKey`): `PKInfo`
 - **interface**: `api.query.swork.pubKeys`
@@ -702,13 +854,9 @@ ___
 - **interface**: `api.query.swork.reportedInSlot`
 - **summary**:   Recording whether the validator reported works of each report slot. We keep the last "HistorySlotDepth" length data cause B-tree won't build index on key2(ReportSlot). The value represent if reported in this slot 
  
-### spower(): `u128`
-- **interface**: `api.query.swork.spower`
-- **summary**:   The spower workload, used for calculating stake limit in the end of each report slot. The default value is 0. 
- 
-### workload(): `Option<(BTreeMap<AccountId,u128>,u128,u128,u128)>`
-- **interface**: `api.query.swork.workload`
-- **summary**:   The workload information 
+### used(): `u128`
+- **interface**: `api.query.swork.used`
+- **summary**:   The used workload, used for calculating stake limit in the end of each report slot. The default value is 0. 
  
 ### workReports(`SworkerAnchor`): `Option<WorkReport>`
 - **interface**: `api.query.swork.workReports`
@@ -790,6 +938,48 @@ ___
 ___
 
 
+## technicalCommittee
+ 
+### members(): `Vec<AccountId>`
+- **interface**: `api.query.technicalCommittee.members`
+- **summary**:   The current members of the collective. This is stored sorted (just by value). 
+ 
+### prime(): `Option<AccountId>`
+- **interface**: `api.query.technicalCommittee.prime`
+- **summary**:   The prime member that helps determine the default vote behavior in case of absentations. 
+ 
+### proposalCount(): `u32`
+- **interface**: `api.query.technicalCommittee.proposalCount`
+- **summary**:   Proposals so far. 
+ 
+### proposalOf(`Hash`): `Option<Proposal>`
+- **interface**: `api.query.technicalCommittee.proposalOf`
+- **summary**:   Actual proposal for a given hash, if it's current. 
+ 
+### proposals(): `Vec<Hash>`
+- **interface**: `api.query.technicalCommittee.proposals`
+- **summary**:   The hashes of the active proposals. 
+ 
+### voting(`Hash`): `Option<Votes>`
+- **interface**: `api.query.technicalCommittee.voting`
+- **summary**:   Votes on a given proposal, if it is ongoing. 
+
+___
+
+
+## technicalMembership
+ 
+### members(): `Vec<AccountId>`
+- **interface**: `api.query.technicalMembership.members`
+- **summary**:   The current membership, stored as an ordered Vec. 
+ 
+### prime(): `Option<AccountId>`
+- **interface**: `api.query.technicalMembership.prime`
+- **summary**:   The current prime member, if one exists. 
+
+___
+
+
 ## timestamp
  
 ### didUpdate(): `bool`
@@ -799,6 +989,19 @@ ___
 ### now(): `Moment`
 - **interface**: `api.query.timestamp.now`
 - **summary**:   Current time for the current block. 
+
+___
+
+
+## tips
+ 
+### reasons(`Hash`): `Option<Bytes>`
+- **interface**: `api.query.tips.reasons`
+- **summary**:   Simple preimage lookup from the reason's hash to the original data. Again, has an insecure enumerable hash since the key is guaranteed to be the result of a secure hash. 
+ 
+### tips(`Hash`): `Option<OpenTip>`
+- **interface**: `api.query.tips.tips`
+- **summary**:   TipsMap that are not yet completed. Keyed by the hash of `(reason, who)` from the value. This has the insecure enumerable hash function since the key itself is already guaranteed to be a secure hash. 
 
 ___
 

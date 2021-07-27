@@ -10,15 +10,19 @@ The following sections contain the module constants, also known as parameter typ
 
 - **[balances](#balances)**
 
+- **[bounties](#bounties)**
+
 - **[claims](#claims)**
+
+- **[democracy](#democracy)**
+
+- **[elections](#elections)**
 
 - **[identity](#identity)**
 
 - **[indices](#indices)**
 
 - **[market](#market)**
-
-- **[multisig](#multisig)**
 
 - **[staking](#staking)**
 
@@ -27,6 +31,8 @@ The following sections contain the module constants, also known as parameter typ
 - **[system](#system)**
 
 - **[timestamp](#timestamp)**
+
+- **[tips](#tips)**
 
 - **[transactionPayment](#transactionpayment)**
 
@@ -58,15 +64,109 @@ ___
 ___
 
 
-## claims
+## bounties
  
-### moduleId: `ModuleId`
-- **interface**: `api.consts.claims.moduleId`
-- **summary**:   The claim's module id, used for deriving its sovereign account ID. 
+### bountyCuratorDeposit: `Permill`
+- **interface**: `api.consts.bounties.bountyCuratorDeposit`
+- **summary**:   Percentage of the curator fee that will be reserved upfront as deposit for bounty curator. 
+ 
+### bountyDepositBase: `BalanceOf`
+- **interface**: `api.consts.bounties.bountyDepositBase`
+- **summary**:   The amount held on deposit for placing a bounty proposal. 
+ 
+### bountyDepositPayoutDelay: `BlockNumber`
+- **interface**: `api.consts.bounties.bountyDepositPayoutDelay`
+- **summary**:   The delay period for which a bounty beneficiary need to wait before claim the payout. 
+ 
+### bountyUpdatePeriod: `BlockNumber`
+- **interface**: `api.consts.bounties.bountyUpdatePeriod`
+- **summary**:   Bounty duration in blocks. 
+ 
+### bountyValueMinimum: `BalanceOf`
+- **interface**: `api.consts.bounties.bountyValueMinimum`
+- **summary**:   Minimum value for a bounty. 
+ 
+### dataDepositPerByte: `BalanceOf`
+- **interface**: `api.consts.bounties.dataDepositPerByte`
+- **summary**:   The amount held on deposit per byte within bounty description. 
+ 
+### maximumReasonLength: `u32`
+- **interface**: `api.consts.bounties.maximumReasonLength`
+- **summary**:   Maximum acceptable reason length. 
+
+___
+
+
+## claims
  
 ### prefix: `Bytes`
 - **interface**: `api.consts.claims.prefix`
 - **summary**:   The Prefix that is used in signed Ethereum messages for this network 
+
+___
+
+
+## democracy
+ 
+### cooloffPeriod: `BlockNumber`
+- **interface**: `api.consts.democracy.cooloffPeriod`
+- **summary**:   Period in blocks where an external proposal may not be re-submitted after being vetoed. 
+ 
+### enactmentPeriod: `BlockNumber`
+- **interface**: `api.consts.democracy.enactmentPeriod`
+- **summary**:   The minimum period of locking and the period between a proposal being approved and enacted. 
+
+  It should generally be a little more than the unstake period to ensure that voting stakers have an opportunity to remove themselves from the system in the case where they are on the losing side of a vote. 
+ 
+### fastTrackVotingPeriod: `BlockNumber`
+- **interface**: `api.consts.democracy.fastTrackVotingPeriod`
+- **summary**:   Minimum voting period allowed for an emergency referendum. 
+ 
+### launchPeriod: `BlockNumber`
+- **interface**: `api.consts.democracy.launchPeriod`
+- **summary**:   How often (in blocks) new public referenda are launched. 
+ 
+### maxVotes: `u32`
+- **interface**: `api.consts.democracy.maxVotes`
+- **summary**:   The maximum number of votes for an account. 
+ 
+### minimumDeposit: `BalanceOf`
+- **interface**: `api.consts.democracy.minimumDeposit`
+- **summary**:   The minimum amount to be used as a deposit for a public referendum proposal. 
+ 
+### preimageByteDeposit: `BalanceOf`
+- **interface**: `api.consts.democracy.preimageByteDeposit`
+- **summary**:   The amount of balance that must be deposited per byte of preimage stored. 
+ 
+### votingPeriod: `BlockNumber`
+- **interface**: `api.consts.democracy.votingPeriod`
+- **summary**:   How often (in blocks) to check for new votes. 
+
+___
+
+
+## elections
+ 
+### candidacyBond: `BalanceOf`
+- **interface**: `api.consts.elections.candidacyBond`
+ 
+### desiredMembers: `u32`
+- **interface**: `api.consts.elections.desiredMembers`
+ 
+### desiredRunnersUp: `u32`
+- **interface**: `api.consts.elections.desiredRunnersUp`
+ 
+### moduleId: `LockIdentifier`
+- **interface**: `api.consts.elections.moduleId`
+ 
+### termDuration: `BlockNumber`
+- **interface**: `api.consts.elections.termDuration`
+ 
+### votingBondBase: `BalanceOf`
+- **interface**: `api.consts.elections.votingBondBase`
+ 
+### votingBondFactor: `BalanceOf`
+- **interface**: `api.consts.elections.votingBondFactor`
 
 ___
 
@@ -115,13 +215,13 @@ ___
 - **interface**: `api.consts.market.fileDuration`
 - **summary**:   The file duration. 
  
+### fileInitPrice: `BalanceOf`
+- **interface**: `api.consts.market.fileInitPrice`
+- **summary**:   The file init price after the chain start. 
+ 
 ### fileReplica: `u32`
 - **interface**: `api.consts.market.fileReplica`
 - **summary**:   The file base replica to get reward. 
- 
-### initFileByteFee: `BalanceOf`
-- **interface**: `api.consts.market.initFileByteFee`
-- **summary**:   The file init price after the chain start. 
  
 ### maximumFileSize: `u64`
 - **interface**: `api.consts.market.maximumFileSize`
@@ -141,11 +241,11 @@ ___
  
 ### storageDecreaseRatio: `Perbill`
 - **interface**: `api.consts.market.storageDecreaseRatio`
-- **summary**:   The storage decrease ratio for each file byte&key fee change. 
+- **summary**:   The storage decrease ratio for each file price change. 
  
 ### storageIncreaseRatio: `Perbill`
 - **interface**: `api.consts.market.storageIncreaseRatio`
-- **summary**:   The storage increase ratio for each file byte&key fee change. 
+- **summary**:   The storage increase ratio for each file price change. 
  
 ### storageRatio: `Perbill`
 - **interface**: `api.consts.market.storageRatio`
@@ -153,29 +253,20 @@ ___
  
 ### storageReferenceRatio: `(u128,u128)`
 - **interface**: `api.consts.market.storageReferenceRatio`
-- **summary**:   The storage reference ratio to adjust the file byte fee. 
-
-___
-
-
-## multisig
+- **summary**:   The storage reference ratio to adjust the file price. 
  
-### depositBase: `BalanceOf`
-- **interface**: `api.consts.multisig.depositBase`
-- **summary**:   The base amount of currency needed to reserve for creating a multisig execution or to store a dispatch call for later. 
- 
-### depositFactor: `BalanceOf`
-- **interface**: `api.consts.multisig.depositFactor`
-- **summary**:   The amount of currency needed per unit threshold when creating a multisig execution. 
- 
-### maxSignatories: `u16`
-- **interface**: `api.consts.multisig.maxSignatories`
-- **summary**:   The maximum amount of signatories allowed for a given multisig. 
+### usedTrashMaxSize: `u128`
+- **interface**: `api.consts.market.usedTrashMaxSize`
+- **summary**:   The max size of used trash. 
 
 ___
 
 
 ## staking
+ 
+### authoringAndStakingRatio: `Perbill`
+- **interface**: `api.consts.staking.authoringAndStakingRatio`
+- **summary**:   Authoring and Staking ratio for market staking pot 
  
 ### bondingDuration: `EraIndex`
 - **interface**: `api.consts.staking.bondingDuration`
@@ -261,6 +352,31 @@ ___
 ### minimumPeriod: `Moment`
 - **interface**: `api.consts.timestamp.minimumPeriod`
 - **summary**:   The minimum period between blocks. Beware that this is different to the *expected* period that the block production apparatus provides. Your chosen consensus system will generally work with this to determine a sensible block time. e.g. For Aura, it will be double this period on default settings. 
+
+___
+
+
+## tips
+ 
+### dataDepositPerByte: `BalanceOf`
+- **interface**: `api.consts.tips.dataDepositPerByte`
+- **summary**:   The amount held on deposit per byte within the tip report reason. 
+ 
+### maximumReasonLength: `u32`
+- **interface**: `api.consts.tips.maximumReasonLength`
+- **summary**:   Maximum acceptable reason length. 
+ 
+### tipCountdown: `BlockNumber`
+- **interface**: `api.consts.tips.tipCountdown`
+- **summary**:   The period for which a tip remains open after is has achieved threshold tippers. 
+ 
+### tipFindersFee: `Percent`
+- **interface**: `api.consts.tips.tipFindersFee`
+- **summary**:   The amount of the final tip which goes to the original reporter of the tip. 
+ 
+### tipReportDepositBase: `BalanceOf`
+- **interface**: `api.consts.tips.tipReportDepositBase`
+- **summary**:   The amount held on deposit for placing a tip report. 
 
 ___
 
