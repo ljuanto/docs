@@ -31,7 +31,7 @@ jobs:
           source: "build"
           target: "~"
 
-      - name: Upgrade apps
+      - name: Upgrade docs
         uses: fifsky/ssh-action@master
         with:
           command: |
