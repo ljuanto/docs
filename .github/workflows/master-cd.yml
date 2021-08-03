@@ -8,19 +8,36 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Build and push docker
-        run: |
-          docker build -t crustio/crust-docs:latest .
-          docker login -u ${{ secrets.DOCKER_HUB_USER_NAME }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
-          docker push crustio/crust-docs:latest
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+          always-auth: true
+          registry-url: https://registry.npmjs.org
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build bundle
+        run: yarn docs
+
+      - name: Upload bundle
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_PRD_HOST }}
+          username: ${{ secrets.SSH_PRD_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "build"
+          target: "~"
+
       - name: Upgrade docs
         uses: fifsky/ssh-action@master
         with:
           command: |
-            docker pull crustio/crust-docs:latest
-            cd /opt/compose
-            docker-compose up -d crust-docs
-          host: ${{ secrets.SSH_HOST }}
-          user: ${{ secrets.SSH_USER }}
+            sudo mv build docs
+            sudo cp -rf docs /usr/
+            sudo rm -rf docs
+          host: ${{ secrets.SSH_PRD_HOST }}
+          user: ${{ secrets.SSH_PRD_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
