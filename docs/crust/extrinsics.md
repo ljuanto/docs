@@ -14,17 +14,7 @@ The following sections contain Extrinsics methods are part of the default Substr
 
 - **[benefits](#benefits)**
 
-- **[bounties](#bounties)**
-
-- **[candy](#candy)**
-
 - **[claims](#claims)**
-
-- **[council](#council)**
-
-- **[democracy](#democracy)**
-
-- **[elections](#elections)**
 
 - **[grandpa](#grandpa)**
 
@@ -34,7 +24,11 @@ The following sections contain Extrinsics methods are part of the default Substr
 
 - **[indices](#indices)**
 
+- **[locks](#locks)**
+
 - **[market](#market)**
+
+- **[multisig](#multisig)**
 
 - **[scheduler](#scheduler)**
 
@@ -48,13 +42,7 @@ The following sections contain Extrinsics methods are part of the default Substr
 
 - **[system](#system)**
 
-- **[technicalCommittee](#technicalcommittee)**
-
-- **[technicalMembership](#technicalmembership)**
-
 - **[timestamp](#timestamp)**
-
-- **[tips](#tips)**
 
 - **[treasury](#treasury)**
 
@@ -101,174 +89,32 @@ ___
   The dispatch origin for this call is `root`. 
 
    
- 
-### transfer(dest: `LookupSource`, value: `Compact<Balance>`)
-- **interface**: `api.tx.balances.transfer`
-- **summary**:   Transfer some liquid free balance to another account. 
-
-  `transfer` will set the `FreeBalance` of the sender and receiver. It will decrease the total issuance of the system by the `TransferFee`. If the sender's account is below the existential deposit as a result of the transfer, the account will be reaped. 
-
-  The dispatch origin for this call must be `Signed` by the transactor. 
-
-   
- 
-### transferKeepAlive(dest: `LookupSource`, value: `Compact<Balance>`)
-- **interface**: `api.tx.balances.transferKeepAlive`
-- **summary**:   Same as the [`transfer`] call, but with a check that the transfer will not kill the origin account. 
-
-  99% of the time you want [`transfer`] instead. 
-
-  [`transfer`]: struct.Pallet.html#method.transfer  
 
 ___
 
 
 ## benefits
  
-### addBenefitFunds(value: `Compact<BalanceOf>`)
+### addBenefitFunds(value: `Compact<BalanceOf>`, funds_type: `FundsType`)
 - **interface**: `api.tx.benefits.addBenefitFunds`
 - **summary**:   Add benefit funds 
  
-### cutBenefitFunds(value: `Compact<BalanceOf>`)
+### cutBenefitFunds(value: `Compact<BalanceOf>`, funds_type: `FundsType`)
 - **interface**: `api.tx.benefits.cutBenefitFunds`
 - **summary**:   Cut benefit funds 
-
-___
-
-
-## bounties
  
-### acceptCurator(bounty_id: `Compact<BountyIndex>`)
-- **interface**: `api.tx.bounties.acceptCurator`
-- **summary**:   Accept the curator role for a bounty. A deposit will be reserved from curator and refund upon successful payout. 
-
-  May only be called from the curator. 
-
-   
+### rebondBenefitFunds(value: `Compact<BalanceOf>`, funds_type: `FundsType`)
+- **interface**: `api.tx.benefits.rebondBenefitFunds`
+- **summary**:   Withdraw benefit funds 
  
-### approveBounty(bounty_id: `Compact<BountyIndex>`)
-- **interface**: `api.tx.bounties.approveBounty`
-- **summary**:   Approve a bounty proposal. At a later time, the bounty will be funded and become active and the original deposit will be returned. 
-
-  May only be called from `T::ApproveOrigin`. 
-
-   
- 
-### awardBounty(bounty_id: `Compact<BountyIndex>`, beneficiary: `LookupSource`)
-- **interface**: `api.tx.bounties.awardBounty`
-- **summary**:   Award bounty to a beneficiary account. The beneficiary will be able to claim the funds after a delay. 
-
-  The dispatch origin for this call must be the curator of this bounty. 
-
-  - `bounty_id`: Bounty ID to award. 
-
-  - `beneficiary`: The beneficiary account whom will receive the payout.
-
-   
- 
-### claimBounty(bounty_id: `Compact<BountyIndex>`)
-- **interface**: `api.tx.bounties.claimBounty`
-- **summary**:   Claim the payout from an awarded bounty after payout delay. 
-
-  The dispatch origin for this call must be the beneficiary of this bounty. 
-
-  - `bounty_id`: Bounty ID to claim. 
-
-   
- 
-### closeBounty(bounty_id: `Compact<BountyIndex>`)
-- **interface**: `api.tx.bounties.closeBounty`
-- **summary**:   Cancel a proposed or active bounty. All the funds will be sent to treasury and the curator deposit will be unreserved if possible. 
-
-  Only `T::RejectOrigin` is able to cancel a bounty. 
-
-  - `bounty_id`: Bounty ID to cancel. 
-
-   
- 
-### extendBountyExpiry(bounty_id: `Compact<BountyIndex>`, _remark: `Bytes`)
-- **interface**: `api.tx.bounties.extendBountyExpiry`
-- **summary**:   Extend the expiry time of an active bounty. 
-
-  The dispatch origin for this call must be the curator of this bounty. 
-
-  - `bounty_id`: Bounty ID to extend. 
-
-  - `remark`: additional information.
-
-   
- 
-### proposeBounty(value: `Compact<BalanceOf>`, description: `Bytes`)
-- **interface**: `api.tx.bounties.proposeBounty`
-- **summary**:   Propose a new bounty. 
-
-  The dispatch origin for this call must be _Signed_. 
-
-  Payment: `TipReportDepositBase` will be reserved from the origin account, as well as `DataDepositPerByte` for each byte in `reason`. It will be unreserved upon approval, or slashed when rejected. 
-
-  - `curator`: The curator account whom will manage this bounty. 
-
-  - `fee`: The curator fee.
-
-  - `value`: The total payment amount of this bounty, curator fee included.
-
-  - `description`: The description of this bounty.
- 
-### proposeCurator(bounty_id: `Compact<BountyIndex>`, curator: `LookupSource`, fee: `Compact<BalanceOf>`)
-- **interface**: `api.tx.bounties.proposeCurator`
-- **summary**:   Assign a curator to a funded bounty. 
-
-  May only be called from `T::ApproveOrigin`. 
-
-   
- 
-### unassignCurator(bounty_id: `Compact<BountyIndex>`)
-- **interface**: `api.tx.bounties.unassignCurator`
-- **summary**:   Unassign curator from a bounty. 
-
-  This function can only be called by the `RejectOrigin` a signed origin. 
-
-  If this function is called by the `RejectOrigin`, we assume that the curator is malicious or inactive. As a result, we will slash the curator when possible. 
-
-  If the origin is the curator, we take this as a sign they are unable to do their job and they willingly give up. We could slash them, but for now we allow them to recover their deposit and exit without issue. (We may want to change this if it is abused.) 
-
-  Finally, the origin can be anyone if and only if the curator is "inactive". This allows anyone in the community to call out that a curator is not doing their due diligence, and we should pick a new curator. In this case the curator should also be slashed. 
-
-   
-
-___
-
-
-## candy
- 
-### burn(target: `LookupSource`, amount: `Compact<Balance>`)
-- **interface**: `api.tx.candy.burn`
-- **summary**:   Destroy candy from `target` account. Only been called by `root` 
-
-   
- 
-### issue(target: `LookupSource`, total: `Compact<Balance>`)
-- **interface**: `api.tx.candy.issue`
-- **summary**:   Issue crust candy. There are, and will only ever be, `total` such candy and they'll all belong to the `root` initially. 
-
-   
- 
-### transfer(target: `LookupSource`, amount: `Compact<Balance>`)
-- **interface**: `api.tx.candy.transfer`
-- **summary**:   Move candy from one holder to another. 
-
-   
+### withdrawBenefitFunds()
+- **interface**: `api.tx.benefits.withdrawBenefitFunds`
+- **summary**:   Withdraw benefit funds 
 
 ___
 
 
 ## claims
- 
-### bondEth(address: `EthereumAddress`)
-- **interface**: `api.tx.claims.bondEth`
-- **summary**:   Register a Ethereum Address for an given account 
-
-   
  
 ### changeMiner(new_miner: `LookupSource`)
 - **interface**: `api.tx.claims.changeMiner`
@@ -293,484 +139,39 @@ ___
 ### claim(dest: `AccountId`, tx: `EthereumTxHash`, sig: `EcdsaSignature`)
 - **interface**: `api.tx.claims.claim`
  
+### initPot(amount: `BalanceOf`)
+- **interface**: `api.tx.claims.initPot`
+- **summary**:   Init claim pot 
+
+  This dispatch origin for this call must be _Root_. 
+
+  Parameter: 
+
+  - `amount`: The amount set for the claim pot
+ 
 ### mintClaim(tx: `EthereumTxHash`, who: `EthereumAddress`, value: `BalanceOf`)
 - **interface**: `api.tx.claims.mintClaim`
 - **summary**:   Mint the claim 
+
+  This dispatch origin for this call must be _Miner_. 
+
+  Parameters: 
+
+  - `tx`: The claim ethereum tx hash
+
+  - `who`: The claimer ethereum address
+
+  - `value`: The amount of this tx, should be less than claim_limit
  
 ### setClaimLimit(limit: `BalanceOf`)
 - **interface**: `api.tx.claims.setClaimLimit`
 - **summary**:   Set claim limit 
 
-___
-
-
-## council
- 
-### close(proposal_hash: `Hash`, index: `Compact<ProposalIndex>`, proposal_weight_bound: `Compact<Weight>`, length_bound: `Compact<u32>`)
-- **interface**: `api.tx.council.close`
-- **summary**:   Close a vote that is either approved, disapproved or whose voting period has ended. 
-
-  May be called by any signed account in order to finish voting and close the proposal. 
-
-  If called before the end of the voting period it will only close the vote if it is has enough votes to be approved or disapproved. 
-
-  If called after the end of the voting period abstentions are counted as rejections unless there is a prime member set and the prime member cast an approval. 
-
-  If the close operation completes successfully with disapproval, the transaction fee will be waived. Otherwise execution of the approved operation will be charged to the caller. 
-
-  + `proposal_weight_bound`: The maximum amount of weight consumed by executing the closed proposal. + `length_bound`: The upper bound for the length of the proposal in storage. Checked via                   `storage::read` so it is `size_of::<u32>() == 4` larger than the pure length. 
-
-   
- 
-### disapproveProposal(proposal_hash: `Hash`)
-- **interface**: `api.tx.council.disapproveProposal`
-- **summary**:   Disapprove a proposal, close, and remove it from the system, regardless of its current state. 
-
-  Must be called by the Root origin. 
+  The dispatch origin for this call must be _Superior_. 
 
   Parameters: 
 
-  * `proposal_hash`: The hash of the proposal that should be disapproved.
-
-   
- 
-### execute(proposal: `Proposal`, length_bound: `Compact<u32>`)
-- **interface**: `api.tx.council.execute`
-- **summary**:   Dispatch a proposal from a member using the `Member` origin. 
-
-  Origin must be a member of the collective. 
-
-   
- 
-### propose(threshold: `Compact<MemberCount>`, proposal: `Proposal`, length_bound: `Compact<u32>`)
-- **interface**: `api.tx.council.propose`
-- **summary**:   Add a new proposal to either be voted on or executed directly. 
-
-  Requires the sender to be member. 
-
-  `threshold` determines whether `proposal` is executed directly (`threshold < 2`) or put up for voting. 
-
-   
- 
-### setMembers(new_members: `Vec<AccountId>`, prime: `Option<AccountId>`, old_count: `MemberCount`)
-- **interface**: `api.tx.council.setMembers`
-- **summary**:   Set the collective's membership. 
-
-  - `new_members`: The new member list. Be nice to the chain and provide it sorted. 
-
-  - `prime`: The prime member whose vote sets the default.
-
-  - `old_count`: The upper bound for the previous number of members in storage.               Used for weight estimation. 
-
-  Requires root origin. 
-
-  NOTE: Does not enforce the expected `MaxMembers` limit on the amount of members, but       the weight estimations rely on it to estimate dispatchable weight. 
-
-   
- 
-### vote(proposal: `Hash`, index: `Compact<ProposalIndex>`, approve: `bool`)
-- **interface**: `api.tx.council.vote`
-- **summary**:   Add an aye or nay vote for the sender to the given proposal. 
-
-  Requires the sender to be a member. 
-
-  Transaction fees will be waived if the member is voting on any particular proposal for the first time and the call is successful. Subsequent vote changes will charge a fee.  
-
-___
-
-
-## democracy
- 
-### blacklist(proposal_hash: `Hash`, maybe_ref_index: `Option<ReferendumIndex>`)
-- **interface**: `api.tx.democracy.blacklist`
-- **summary**:   Permanently place a proposal into the blacklist. This prevents it from ever being proposed again. 
-
-  If called on a queued public or external proposal, then this will result in it being removed. If the `ref_index` supplied is an active referendum with the proposal hash, then it will be cancelled. 
-
-  The dispatch origin of this call must be `BlacklistOrigin`. 
-
-  - `proposal_hash`: The proposal hash to blacklist permanently. 
-
-  - `ref_index`: An ongoing referendum whose hash is `proposal_hash`, which will becancelled. 
-
-  Weight: `O(p)` (though as this is an high-privilege dispatch, we assume it has a   reasonable value). 
- 
-### cancelProposal(prop_index: `Compact<PropIndex>`)
-- **interface**: `api.tx.democracy.cancelProposal`
-- **summary**:   Remove a proposal. 
-
-  The dispatch origin of this call must be `CancelProposalOrigin`. 
-
-  - `prop_index`: The index of the proposal to cancel. 
-
-  Weight: `O(p)` where `p = PublicProps::<T>::decode_len()` 
- 
-### cancelQueued(which: `ReferendumIndex`)
-- **interface**: `api.tx.democracy.cancelQueued`
-- **summary**:   Cancel a proposal queued for enactment. 
-
-  The dispatch origin of this call must be _Root_. 
-
-  - `which`: The index of the referendum to cancel. 
-
-  Weight: `O(D)` where `D` is the items in the dispatch queue. Weighted as `D = 10`. 
- 
-### cancelReferendum(ref_index: `Compact<ReferendumIndex>`)
-- **interface**: `api.tx.democracy.cancelReferendum`
-- **summary**:   Remove a referendum. 
-
-  The dispatch origin of this call must be _Root_. 
-
-  - `ref_index`: The index of the referendum to cancel. 
-
-  Weight: `O(1)`. 
- 
-### clearPublicProposals()
-- **interface**: `api.tx.democracy.clearPublicProposals`
-- **summary**:   Clears all public proposals. 
-
-  The dispatch origin of this call must be _Root_. 
-
-  Weight: `O(1)`. 
- 
-### delegate(to: `AccountId`, conviction: `Conviction`, balance: `BalanceOf`)
-- **interface**: `api.tx.democracy.delegate`
-- **summary**:   Delegate the voting power (with some given conviction) of the sending account. 
-
-  The balance delegated is locked for as long as it's delegated, and thereafter for the time appropriate for the conviction's lock period. 
-
-  The dispatch origin of this call must be _Signed_, and the signing account must either: 
-
-    - be delegating already; or
-
-    - have no voting activity (if there is, then it will need to be removed/consolidated    through `reap_vote` or `unvote`). 
-
-  - `to`: The account whose voting the `target` account's voting power will follow. 
-
-  - `conviction`: The conviction that will be attached to the delegated votes. When the  account is undelegated, the funds will be locked for the corresponding period. 
-
-  - `balance`: The amount of the account's balance to be used in delegating. This must  not be more than the account's current balance. 
-
-  Emits `Delegated`. 
-
-  Weight: `O(R)` where R is the number of referendums the voter delegating to has   voted on. Weight is charged as if maximum votes. 
- 
-### emergencyCancel(ref_index: `ReferendumIndex`)
-- **interface**: `api.tx.democracy.emergencyCancel`
-- **summary**:   Schedule an emergency cancellation of a referendum. Cannot happen twice to the same referendum. 
-
-  The dispatch origin of this call must be `CancellationOrigin`. 
-
-  -`ref_index`: The index of the referendum to cancel. 
-
-  Weight: `O(1)`. 
- 
-### enactProposal(proposal_hash: `Hash`, index: `ReferendumIndex`)
-- **interface**: `api.tx.democracy.enactProposal`
-- **summary**:   Enact a proposal from a referendum. For now we just make the weight be the maximum. 
- 
-### externalPropose(proposal_hash: `Hash`)
-- **interface**: `api.tx.democracy.externalPropose`
-- **summary**:   Schedule a referendum to be tabled once it is legal to schedule an external referendum. 
-
-  The dispatch origin of this call must be `ExternalOrigin`. 
-
-  - `proposal_hash`: The preimage hash of the proposal. 
-
-  Weight: `O(V)` with V number of vetoers in the blacklist of proposal.   Decoding vec of length V. Charged as maximum 
- 
-### externalProposeDefault(proposal_hash: `Hash`)
-- **interface**: `api.tx.democracy.externalProposeDefault`
-- **summary**:   Schedule a negative-turnout-bias referendum to be tabled next once it is legal to schedule an external referendum. 
-
-  The dispatch of this call must be `ExternalDefaultOrigin`. 
-
-  - `proposal_hash`: The preimage hash of the proposal. 
-
-  Unlike `external_propose`, blacklisting has no effect on this and it may replace a pre-scheduled `external_propose` call. 
-
-  Weight: `O(1)` 
- 
-### externalProposeMajority(proposal_hash: `Hash`)
-- **interface**: `api.tx.democracy.externalProposeMajority`
-- **summary**:   Schedule a majority-carries referendum to be tabled next once it is legal to schedule an external referendum. 
-
-  The dispatch of this call must be `ExternalMajorityOrigin`. 
-
-  - `proposal_hash`: The preimage hash of the proposal. 
-
-  Unlike `external_propose`, blacklisting has no effect on this and it may replace a pre-scheduled `external_propose` call. 
-
-  Weight: `O(1)` 
- 
-### fastTrack(proposal_hash: `Hash`, voting_period: `BlockNumber`, delay: `BlockNumber`)
-- **interface**: `api.tx.democracy.fastTrack`
-- **summary**:   Schedule the currently externally-proposed majority-carries referendum to be tabled immediately. If there is no externally-proposed referendum currently, or if there is one but it is not a majority-carries referendum then it fails. 
-
-  The dispatch of this call must be `FastTrackOrigin`. 
-
-  - `proposal_hash`: The hash of the current external proposal. 
-
-  - `voting_period`: The period that is allowed for voting on this proposal. Increased to  `FastTrackVotingPeriod` if too low. 
-
-  - `delay`: The number of block after voting has ended in approval and this should be  enacted. This doesn't have a minimum amount. 
-
-  Emits `Started`. 
-
-  Weight: `O(1)` 
- 
-### noteImminentPreimage(encoded_proposal: `Bytes`)
-- **interface**: `api.tx.democracy.noteImminentPreimage`
-- **summary**:   Register the preimage for an upcoming proposal. This requires the proposal to be in the dispatch queue. No deposit is needed. When this call is successful, i.e. the preimage has not been uploaded before and matches some imminent proposal, no fee is paid. 
-
-  The dispatch origin of this call must be _Signed_. 
-
-  - `encoded_proposal`: The preimage of a proposal. 
-
-  Emits `PreimageNoted`. 
-
-  Weight: `O(E)` with E size of `encoded_proposal` (protected by a required deposit). 
- 
-### noteImminentPreimageOperational(encoded_proposal: `Bytes`)
-- **interface**: `api.tx.democracy.noteImminentPreimageOperational`
-- **summary**:   Same as `note_imminent_preimage` but origin is `OperationalPreimageOrigin`. 
- 
-### notePreimage(encoded_proposal: `Bytes`)
-- **interface**: `api.tx.democracy.notePreimage`
-- **summary**:   Register the preimage for an upcoming proposal. This doesn't require the proposal to be in the dispatch queue but does require a deposit, returned once enacted. 
-
-  The dispatch origin of this call must be _Signed_. 
-
-  - `encoded_proposal`: The preimage of a proposal. 
-
-  Emits `PreimageNoted`. 
-
-  Weight: `O(E)` with E size of `encoded_proposal` (protected by a required deposit). 
- 
-### notePreimageOperational(encoded_proposal: `Bytes`)
-- **interface**: `api.tx.democracy.notePreimageOperational`
-- **summary**:   Same as `note_preimage` but origin is `OperationalPreimageOrigin`. 
- 
-### propose(proposal_hash: `Hash`, value: `Compact<BalanceOf>`)
-- **interface**: `api.tx.democracy.propose`
-- **summary**:   Propose a sensitive action to be taken. 
-
-  The dispatch origin of this call must be _Signed_ and the sender must have funds to cover the deposit. 
-
-  - `proposal_hash`: The hash of the proposal preimage. 
-
-  - `value`: The amount of deposit (must be at least `MinimumDeposit`).
-
-  Emits `Proposed`. 
-
-  Weight: `O(p)` 
- 
-### reapPreimage(proposal_hash: `Hash`, proposal_len_upper_bound: `Compact<u32>`)
-- **interface**: `api.tx.democracy.reapPreimage`
-- **summary**:   Remove an expired proposal preimage and collect the deposit. 
-
-  The dispatch origin of this call must be _Signed_. 
-
-  - `proposal_hash`: The preimage hash of a proposal. 
-
-  - `proposal_length_upper_bound`: an upper bound on length of the proposal.  Extrinsic is weighted according to this value with no refund. 
-
-  This will only work after `VotingPeriod` blocks from the time that the preimage was noted, if it's the same account doing it. If it's a different account, then it'll only work an additional `EnactmentPeriod` later. 
-
-  Emits `PreimageReaped`. 
-
-  Weight: `O(D)` where D is length of proposal. 
- 
-### removeOtherVote(target: `AccountId`, index: `ReferendumIndex`)
-- **interface**: `api.tx.democracy.removeOtherVote`
-- **summary**:   Remove a vote for a referendum. 
-
-  If the `target` is equal to the signer, then this function is exactly equivalent to `remove_vote`. If not equal to the signer, then the vote must have expired, either because the referendum was cancelled, because the voter lost the referendum or because the conviction period is over. 
-
-  The dispatch origin of this call must be _Signed_. 
-
-  - `target`: The account of the vote to be removed; this account must have voted for   referendum `index`. 
-
-  - `index`: The index of referendum of the vote to be removed.
-
-  Weight: `O(R + log R)` where R is the number of referenda that `target` has voted on.   Weight is calculated for the maximum number of vote. 
- 
-### removeVote(index: `ReferendumIndex`)
-- **interface**: `api.tx.democracy.removeVote`
-- **summary**:   Remove a vote for a referendum. 
-
-  If: 
-
-  - the referendum was cancelled, or
-
-  - the referendum is ongoing, or
-
-  - the referendum has ended such that
-
-    - the vote of the account was in opposition to the result; or
-
-    - there was no conviction to the account's vote; or
-
-    - the account made a split vote...then the vote is removed cleanly and a following call to `unlock` may result in more funds being available. 
-
-  If, however, the referendum has ended and: 
-
-  - it finished corresponding to the vote of the account, and
-
-  - the account made a standard vote with conviction, and
-
-  - the lock period of the conviction is not over...then the lock will be aggregated into the overall account's lock, which may involve 
-
-  *overlocking* (where the two locks are combined into a single lock that is the maximumof both the amount locked and the time is it locked for). 
-
-  The dispatch origin of this call must be _Signed_, and the signer must have a vote registered for referendum `index`. 
-
-  - `index`: The index of referendum of the vote to be removed. 
-
-  Weight: `O(R + log R)` where R is the number of referenda that `target` has voted on.   Weight is calculated for the maximum number of vote. 
- 
-### second(proposal: `Compact<PropIndex>`, seconds_upper_bound: `Compact<u32>`)
-- **interface**: `api.tx.democracy.second`
-- **summary**:   Signals agreement with a particular proposal. 
-
-  The dispatch origin of this call must be _Signed_ and the sender must have funds to cover the deposit, equal to the original deposit. 
-
-  - `proposal`: The index of the proposal to second. 
-
-  - `seconds_upper_bound`: an upper bound on the current number of seconds on this  proposal. Extrinsic is weighted according to this value with no refund. 
-
-  Weight: `O(S)` where S is the number of seconds a proposal already has. 
- 
-### undelegate()
-- **interface**: `api.tx.democracy.undelegate`
-- **summary**:   Undelegate the voting power of the sending account. 
-
-  Tokens may be unlocked following once an amount of time consistent with the lock period of the conviction with which the delegation was issued. 
-
-  The dispatch origin of this call must be _Signed_ and the signing account must be currently delegating. 
-
-  Emits `Undelegated`. 
-
-  Weight: `O(R)` where R is the number of referendums the voter delegating to has   voted on. Weight is charged as if maximum votes. 
- 
-### unlock(target: `AccountId`)
-- **interface**: `api.tx.democracy.unlock`
-- **summary**:   Unlock tokens that have an expired lock. 
-
-  The dispatch origin of this call must be _Signed_. 
-
-  - `target`: The account to remove the lock on. 
-
-  Weight: `O(R)` with R number of vote of target. 
- 
-### vetoExternal(proposal_hash: `Hash`)
-- **interface**: `api.tx.democracy.vetoExternal`
-- **summary**:   Veto and blacklist the external proposal hash. 
-
-  The dispatch origin of this call must be `VetoOrigin`. 
-
-  - `proposal_hash`: The preimage hash of the proposal to veto and blacklist. 
-
-  Emits `Vetoed`. 
-
-  Weight: `O(V + log(V))` where V is number of `existing vetoers` 
- 
-### vote(ref_index: `Compact<ReferendumIndex>`, vote: `AccountVote`)
-- **interface**: `api.tx.democracy.vote`
-- **summary**:   Vote in a referendum. If `vote.is_aye()`, the vote is to enact the proposal; otherwise it is a vote to keep the status quo. 
-
-  The dispatch origin of this call must be _Signed_. 
-
-  - `ref_index`: The index of the referendum to vote for. 
-
-  - `vote`: The vote configuration.
-
-  Weight: `O(R)` where R is the number of referendums the voter has voted on. 
-
-___
-
-
-## elections
- 
-### cleanDefunctVoters(_num_voters: `u32`, _num_defunct: `u32`)
-- **interface**: `api.tx.elections.cleanDefunctVoters`
-- **summary**:   Clean all voters who are defunct (i.e. they do not serve any purpose at all). The deposit of the removed voters are returned. 
-
-  This is an root function to be used only for cleaning the state. 
-
-  The dispatch origin of this call must be root. 
-
-   
- 
-### removeMember(who: `LookupSource`, has_replacement: `bool`)
-- **interface**: `api.tx.elections.removeMember`
-- **summary**:   Remove a particular member from the set. This is effective immediately and the bond of the outgoing member is slashed. 
-
-  If a runner-up is available, then the best runner-up will be removed and replaces the outgoing member. Otherwise, a new phragmen election is started. 
-
-  The dispatch origin of this call must be root. 
-
-  Note that this does not affect the designated block number of the next election. 
-
-   
- 
-### removeVoter()
-- **interface**: `api.tx.elections.removeVoter`
-- **summary**:   Remove `origin` as a voter. 
-
-  This removes the lock and returns the deposit. 
-
-  The dispatch origin of this call must be signed and be a voter. 
- 
-### renounceCandidacy(renouncing: `Renouncing`)
-- **interface**: `api.tx.elections.renounceCandidacy`
-- **summary**:   Renounce one's intention to be a candidate for the next election round. 3 potential outcomes exist: 
-
-  - `origin` is a candidate and not elected in any set. In this case, the deposit is   unreserved, returned and origin is removed as a candidate. 
-
-  - `origin` is a current runner-up. In this case, the deposit is unreserved, returned and  origin is removed as a runner-up. 
-
-  - `origin` is a current member. In this case, the deposit is unreserved and origin is  removed as a member, consequently not being a candidate for the next round anymore.   Similar to [`remove_members`], if replacement runners exists, they are immediately used.   If the prime is renouncing, then no prime will exist until the next round. 
-
-  The dispatch origin of this call must be signed, and have one of the above roles. 
-
-   
- 
-### submitCandidacy(candidate_count: `Compact<u32>`)
-- **interface**: `api.tx.elections.submitCandidacy`
-- **summary**:   Submit oneself for candidacy. A fixed amount of deposit is recorded. 
-
-  All candidates are wiped at the end of the term. They either become a member/runner-up, or leave the system while their deposit is slashed. 
-
-  The dispatch origin of this call must be signed. 
-
-  #### Warning 
-
-  Even if a candidate ends up being a member, they must call [`Call::renounce_candidacy`] to get their deposit back. Losing the spot in an election will always lead to a slash. 
-
-   
- 
-### vote(votes: `Vec<AccountId>`, value: `Compact<BalanceOf>`)
-- **interface**: `api.tx.elections.vote`
-- **summary**:   Vote for a set of candidates for the upcoming round of election. This can be called to set the initial votes, or update already existing votes. 
-
-  Upon initial voting, `value` units of `who`'s balance is locked and a deposit amount is reserved. The deposit is based on the number of votes and can be updated over time. 
-
-  The `votes` should: 
-
-    - not be empty.
-
-    - be less than the number of possible candidates. Note that all current members and    runners-up are also automatically candidates for the next round. 
-
-  If `value` is more than `who`'s total balance, then the maximum of the two is used. 
-
-  The dispatch origin of this call must be signed. 
-
-  #### Warning 
-
-  It is the responsibility of the caller to **NOT** place all of their balance into the lock and keep some for further operations. 
-
-   
+  - `limit`: The claim CRUs limit
 
 ___
 
@@ -1063,13 +464,20 @@ ___
 ___
 
 
-## market
+## locks
  
-### addCollateral(value: `Compact<BalanceOf>`)
-- **interface**: `api.tx.market.addCollateral`
-- **summary**:   Add extra collateral amount of currency to accept storage order. 
+### setUnlockFrom(date: `BlockNumber`)
+- **interface**: `api.tx.locks.setUnlockFrom`
+- **summary**:   Set the global start date It can only be set once 
+ 
+### unlock()
+- **interface**: `api.tx.locks.unlock`
+- **summary**:   Unlock the CRU18 or CRU24 one period 
 
-   
+___
+
+
+## market
  
 ### addPrepaid(cid: `MerkleRoot`, amount: `Compact<BalanceOf>`)
 - **interface**: `api.tx.market.addPrepaid`
@@ -1079,21 +487,9 @@ ___
 - **interface**: `api.tx.market.calculateReward`
 - **summary**:   Calculate the reward for a file 
  
-### cutCollateral(value: `Compact<BalanceOf>`)
-- **interface**: `api.tx.market.cutCollateral`
-- **summary**:   Decrease extra collateral amount of currency to accept storage order. 
-
-   
- 
-### placeStorageOrder(cid: `MerkleRoot`, reported_file_size: `u64`, tips: `Compact<BalanceOf>`)
+### placeStorageOrder(cid: `MerkleRoot`, reported_file_size: `u64`, tips: `Compact<BalanceOf>`, _memo: `Bytes`)
 - **interface**: `api.tx.market.placeStorageOrder`
 - **summary**:   Place a storage order. The cid and file_size of this file should be provided. Extra tips is accepted. 
- 
-### register(collateral: `Compact<BalanceOf>`)
-- **interface**: `api.tx.market.register`
-- **summary**:   Register to be a merchant. This will require you to collateral first, complexity depends on `Collaterals`(P). 
-
-   
  
 ### rewardMerchant()
 - **interface**: `api.tx.market.rewardMerchant`
@@ -1102,10 +498,93 @@ ___
 ### setBaseFee(base_fee: `Compact<BalanceOf>`)
 - **interface**: `api.tx.market.setBaseFee`
 - **summary**:   Set the file base fee 
+
+  The dispatch origin for this call must be _Root_. 
  
-### setMarketSwitch(is_enabled: `bool`)
-- **interface**: `api.tx.market.setMarketSwitch`
-- **summary**:   Set the global switch 
+### setEnableMarket(is_enabled: `bool`)
+- **interface**: `api.tx.market.setEnableMarket`
+- **summary**:   Open/Close market service 
+
+  The dispatch origin for this call must be _Root_. 
+
+___
+
+
+## multisig
+ 
+### approveAsMulti(threshold: `u16`, other_signatories: `Vec<AccountId>`, maybe_timepoint: `Option<Timepoint>`, call_hash: `[u8;32]`, max_weight: `Weight`)
+- **interface**: `api.tx.multisig.approveAsMulti`
+- **summary**:   Register approval for a dispatch to be made from a deterministic composite account if approved by a total of `threshold - 1` of `other_signatories`. 
+
+  Payment: `DepositBase` will be reserved if this is the first approval, plus `threshold` times `DepositFactor`. It is returned once this dispatch happens or is cancelled. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  - `threshold`: The total number of approvals for this dispatch before it is executed. 
+
+  - `other_signatories`: The accounts (other than the sender) who can approve thisdispatch. May not be empty. 
+
+  - `maybe_timepoint`: If this is the first approval, then this must be `None`. If it isnot the first approval, then it must be `Some`, with the timepoint (block number and transaction index) of the first approval transaction. 
+
+  - `call_hash`: The hash of the call to be executed.
+
+  NOTE: If this is the final approval, you will want to use `as_multi` instead. 
+
+   
+ 
+### asMulti(threshold: `u16`, other_signatories: `Vec<AccountId>`, maybe_timepoint: `Option<Timepoint>`, call: `OpaqueCall`, store_call: `bool`, max_weight: `Weight`)
+- **interface**: `api.tx.multisig.asMulti`
+- **summary**:   Register approval for a dispatch to be made from a deterministic composite account if approved by a total of `threshold - 1` of `other_signatories`. 
+
+  If there are enough, then dispatch the call. 
+
+  Payment: `DepositBase` will be reserved if this is the first approval, plus `threshold` times `DepositFactor`. It is returned once this dispatch happens or is cancelled. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  - `threshold`: The total number of approvals for this dispatch before it is executed. 
+
+  - `other_signatories`: The accounts (other than the sender) who can approve thisdispatch. May not be empty. 
+
+  - `maybe_timepoint`: If this is the first approval, then this must be `None`. If it isnot the first approval, then it must be `Some`, with the timepoint (block number and transaction index) of the first approval transaction. 
+
+  - `call`: The call to be executed.
+
+  NOTE: Unless this is the final approval, you will generally want to use `approve_as_multi` instead, since it only requires a hash of the call. 
+
+  Result is equivalent to the dispatched result if `threshold` is exactly `1`. Otherwise on success, result is `Ok` and the result from the interior call, if it was executed, may be found in the deposited `MultisigExecuted` event. 
+
+   
+ 
+### asMultiThreshold1(other_signatories: `Vec<AccountId>`, call: `Call`)
+- **interface**: `api.tx.multisig.asMultiThreshold1`
+- **summary**:   Immediately dispatch a multi-signature call using a single approval from the caller. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  - `other_signatories`: The accounts (other than the sender) who are part of the multi-signature, but do not participate in the approval process. 
+
+  - `call`: The call to be executed.
+
+  Result is equivalent to the dispatched result. 
+
+   
+ 
+### cancelAsMulti(threshold: `u16`, other_signatories: `Vec<AccountId>`, timepoint: `Timepoint`, call_hash: `[u8;32]`)
+- **interface**: `api.tx.multisig.cancelAsMulti`
+- **summary**:   Cancel a pre-existing, on-going multisig transaction. Any deposit reserved previously for this operation will be unreserved on success. 
+
+  The dispatch origin for this call must be _Signed_. 
+
+  - `threshold`: The total number of approvals for this dispatch before it is executed. 
+
+  - `other_signatories`: The accounts (other than the sender) who can approve thisdispatch. May not be empty. 
+
+  - `timepoint`: The timepoint (block number and transaction index) of the first approvaltransaction for this dispatch. 
+
+  - `call_hash`: The hash of the call to be executed.
+
+   
 
 ___
 
@@ -1294,10 +773,6 @@ ___
 
    
  
-### rechargeStakingPot(value: `Compact<BalanceOf>`)
-- **interface**: `api.tx.staking.rechargeStakingPot`
-- **summary**:   Recharge the staking pot 
- 
 ### rewardStakers(validator_stash: `AccountId`, era: `EraIndex`)
 - **interface**: `api.tx.staking.rewardStakers`
 - **summary**:   Pay out all the stakers behind a single validator for a single era. 
@@ -1429,9 +904,8 @@ ___
 
 ## swork
  
-### cancelPunishment(target: `LookupSource`)
-- **interface**: `api.tx.swork.cancelPunishment`
-- **summary**:   Cancel punishment for a specific account. This can only be done by Root/Democracy. 
+### addMemberIntoAllowlist(target: `LookupSource`)
+- **interface**: `api.tx.swork.addMemberIntoAllowlist`
  
 ### createGroup()
 - **interface**: `api.tx.swork.createGroup`
@@ -1439,7 +913,7 @@ ___
  
 ### joinGroup(target: `LookupSource`)
 - **interface**: `api.tx.swork.joinGroup`
-- **summary**:   Join a group. The account should already report works once and cannot have any used value. The target must be a group owner. 
+- **summary**:   Join a group. The account should already report works once and cannot have any spower value. The target must be a group owner. 
  
 ### kickOut(target: `LookupSource`)
 - **interface**: `api.tx.swork.kickOut`
@@ -1459,6 +933,9 @@ ___
 
    
  
+### removeMemberFromAllowlist(target: `LookupSource`)
+- **interface**: `api.tx.swork.removeMemberFromAllowlist`
+ 
 ### reportWorks(curr_pk: `SworkerPubKey`, ab_upgrade_pk: `SworkerPubKey`, slot: `u64`, slot_hash: `Bytes`, reported_srd_size: `u64`, reported_files_size: `u64`, added_files: `Vec<(MerkleRoot,u64,u64)>`, deleted_files: `Vec<(MerkleRoot,u64,u64)>`, reported_srd_root: `MerkleRoot`, reported_files_root: `MerkleRoot`, sig: `SworkerSignature`)
 - **interface**: `api.tx.swork.reportWorks`
 - **summary**:   Report storage works from sWorker All `inputs` can only be generated from sWorker's enclave 
@@ -1474,6 +951,10 @@ ___
 - **summary**:   Set code for AB Upgrade, this should only be called by `root` origin Ruled by `sudo/democracy` 
 
    
+ 
+### setPunishment(is_enabled: `bool`)
+- **interface**: `api.tx.swork.setPunishment`
+- **summary**:   Set the punishment flag 
 
 ___
 
@@ -1537,132 +1018,6 @@ ___
 ___
 
 
-## technicalCommittee
- 
-### close(proposal_hash: `Hash`, index: `Compact<ProposalIndex>`, proposal_weight_bound: `Compact<Weight>`, length_bound: `Compact<u32>`)
-- **interface**: `api.tx.technicalCommittee.close`
-- **summary**:   Close a vote that is either approved, disapproved or whose voting period has ended. 
-
-  May be called by any signed account in order to finish voting and close the proposal. 
-
-  If called before the end of the voting period it will only close the vote if it is has enough votes to be approved or disapproved. 
-
-  If called after the end of the voting period abstentions are counted as rejections unless there is a prime member set and the prime member cast an approval. 
-
-  If the close operation completes successfully with disapproval, the transaction fee will be waived. Otherwise execution of the approved operation will be charged to the caller. 
-
-  + `proposal_weight_bound`: The maximum amount of weight consumed by executing the closed proposal. + `length_bound`: The upper bound for the length of the proposal in storage. Checked via                   `storage::read` so it is `size_of::<u32>() == 4` larger than the pure length. 
-
-   
- 
-### disapproveProposal(proposal_hash: `Hash`)
-- **interface**: `api.tx.technicalCommittee.disapproveProposal`
-- **summary**:   Disapprove a proposal, close, and remove it from the system, regardless of its current state. 
-
-  Must be called by the Root origin. 
-
-  Parameters: 
-
-  * `proposal_hash`: The hash of the proposal that should be disapproved.
-
-   
- 
-### execute(proposal: `Proposal`, length_bound: `Compact<u32>`)
-- **interface**: `api.tx.technicalCommittee.execute`
-- **summary**:   Dispatch a proposal from a member using the `Member` origin. 
-
-  Origin must be a member of the collective. 
-
-   
- 
-### propose(threshold: `Compact<MemberCount>`, proposal: `Proposal`, length_bound: `Compact<u32>`)
-- **interface**: `api.tx.technicalCommittee.propose`
-- **summary**:   Add a new proposal to either be voted on or executed directly. 
-
-  Requires the sender to be member. 
-
-  `threshold` determines whether `proposal` is executed directly (`threshold < 2`) or put up for voting. 
-
-   
- 
-### setMembers(new_members: `Vec<AccountId>`, prime: `Option<AccountId>`, old_count: `MemberCount`)
-- **interface**: `api.tx.technicalCommittee.setMembers`
-- **summary**:   Set the collective's membership. 
-
-  - `new_members`: The new member list. Be nice to the chain and provide it sorted. 
-
-  - `prime`: The prime member whose vote sets the default.
-
-  - `old_count`: The upper bound for the previous number of members in storage.               Used for weight estimation. 
-
-  Requires root origin. 
-
-  NOTE: Does not enforce the expected `MaxMembers` limit on the amount of members, but       the weight estimations rely on it to estimate dispatchable weight. 
-
-   
- 
-### vote(proposal: `Hash`, index: `Compact<ProposalIndex>`, approve: `bool`)
-- **interface**: `api.tx.technicalCommittee.vote`
-- **summary**:   Add an aye or nay vote for the sender to the given proposal. 
-
-  Requires the sender to be a member. 
-
-  Transaction fees will be waived if the member is voting on any particular proposal for the first time and the call is successful. Subsequent vote changes will charge a fee.  
-
-___
-
-
-## technicalMembership
- 
-### addMember(who: `AccountId`)
-- **interface**: `api.tx.technicalMembership.addMember`
-- **summary**:   Add a member `who` to the set. 
-
-  May only be called from `T::AddOrigin`. 
- 
-### changeKey(new: `AccountId`)
-- **interface**: `api.tx.technicalMembership.changeKey`
-- **summary**:   Swap out the sending member for some other key `new`. 
-
-  May only be called from `Signed` origin of a current member. 
-
-  Prime membership is passed from the origin account to `new`, if extant. 
- 
-### clearPrime()
-- **interface**: `api.tx.technicalMembership.clearPrime`
-- **summary**:   Remove the prime member if it exists. 
-
-  May only be called from `T::PrimeOrigin`. 
- 
-### removeMember(who: `AccountId`)
-- **interface**: `api.tx.technicalMembership.removeMember`
-- **summary**:   Remove a member `who` from the set. 
-
-  May only be called from `T::RemoveOrigin`. 
- 
-### resetMembers(members: `Vec<AccountId>`)
-- **interface**: `api.tx.technicalMembership.resetMembers`
-- **summary**:   Change the membership to a new set, disregarding the existing membership. Be nice and pass `members` pre-sorted. 
-
-  May only be called from `T::ResetOrigin`. 
- 
-### setPrime(who: `AccountId`)
-- **interface**: `api.tx.technicalMembership.setPrime`
-- **summary**:   Set the prime member. Must be a current member. 
-
-  May only be called from `T::PrimeOrigin`. 
- 
-### swapMember(remove: `AccountId`, add: `AccountId`)
-- **interface**: `api.tx.technicalMembership.swapMember`
-- **summary**:   Swap out one member `remove` for another `add`. 
-
-  May only be called from `T::SwapOrigin`. 
-
-  Prime membership is *not* passed from `remove` to `add`, if extant. 
-
-___
-
-
 ## timestamp
  
 ### set(now: `Compact<Moment>`)
@@ -1674,95 +1029,6 @@ ___
   The timestamp should be greater than the previous one by the amount specified by `MinimumPeriod`. 
 
   The dispatch origin for this call must be `Inherent`. 
-
-   
-
-___
-
-
-## tips
- 
-### closeTip(hash: `Hash`)
-- **interface**: `api.tx.tips.closeTip`
-- **summary**:   Close and payout a tip. 
-
-  The dispatch origin for this call must be _Signed_. 
-
-  The tip identified by `hash` must have finished its countdown period. 
-
-  - `hash`: The identity of the open tip for which a tip value is declared. This is formed   as the hash of the tuple of the original tip `reason` and the beneficiary account ID. 
-
-   
- 
-### reportAwesome(reason: `Bytes`, who: `AccountId`)
-- **interface**: `api.tx.tips.reportAwesome`
-- **summary**:   Report something `reason` that deserves a tip and claim any eventual the finder's fee. 
-
-  The dispatch origin for this call must be _Signed_. 
-
-  Payment: `TipReportDepositBase` will be reserved from the origin account, as well as `DataDepositPerByte` for each byte in `reason`. 
-
-  - `reason`: The reason for, or the thing that deserves, the tip; generally this will be   a UTF-8-encoded URL. 
-
-  - `who`: The account which should be credited for the tip.
-
-  Emits `NewTip` if successful. 
-
-   
- 
-### retractTip(hash: `Hash`)
-- **interface**: `api.tx.tips.retractTip`
-- **summary**:   Retract a prior tip-report from `report_awesome`, and cancel the process of tipping. 
-
-  If successful, the original deposit will be unreserved. 
-
-  The dispatch origin for this call must be _Signed_ and the tip identified by `hash` must have been reported by the signing account through `report_awesome` (and not through `tip_new`). 
-
-  - `hash`: The identity of the open tip for which a tip value is declared. This is formed   as the hash of the tuple of the original tip `reason` and the beneficiary account ID. 
-
-  Emits `TipRetracted` if successful. 
-
-   
- 
-### slashTip(hash: `Hash`)
-- **interface**: `api.tx.tips.slashTip`
-- **summary**:   Remove and slash an already-open tip. 
-
-  May only be called from `T::RejectOrigin`. 
-
-  As a result, the finder is slashed and the deposits are lost. 
-
-  Emits `TipSlashed` if successful. 
-
-   
- 
-### tip(hash: `Hash`, tip_value: `Compact<BalanceOf>`)
-- **interface**: `api.tx.tips.tip`
-- **summary**:   Declare a tip value for an already-open tip. 
-
-  The dispatch origin for this call must be _Signed_ and the signing account must be a member of the `Tippers` set. 
-
-  - `hash`: The identity of the open tip for which a tip value is declared. This is formed   as the hash of the tuple of the hash of the original tip `reason` and the beneficiary   account ID. 
-
-  - `tip_value`: The amount of tip that the sender would like to give. The median tip  value of active tippers will be given to the `who`. 
-
-  Emits `TipClosing` if the threshold of tippers has been reached and the countdown period has started. 
-
-   
- 
-### tipNew(reason: `Bytes`, who: `AccountId`, tip_value: `Compact<BalanceOf>`)
-- **interface**: `api.tx.tips.tipNew`
-- **summary**:   Give a tip for something new; no finder's fee will be taken. 
-
-  The dispatch origin for this call must be _Signed_ and the signing account must be a member of the `Tippers` set. 
-
-  - `reason`: The reason for, or the thing that deserves, the tip; generally this will be   a UTF-8-encoded URL. 
-
-  - `who`: The account which should be credited for the tip.
-
-  - `tip_value`: The amount of tip that the sender would like to give. The median tip  value of active tippers will be given to the `who`. 
-
-  Emits `NewTip` if successful. 
 
    
 
