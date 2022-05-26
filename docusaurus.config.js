@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NODE_ENV === 'development' ? '/' : '/docs/';
+// const BASE_URL = process.env.NODE_ENV === 'development' ? '/' : '/docs/';
 
 module.exports = {
   title: 'crust{.js}',
