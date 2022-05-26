@@ -1,10 +1,10 @@
-const BASE_URL = process.env.NODE_ENV === 'development' ? '/' : '/docs/';
+// const BASE_URL = process.env.NODE_ENV === 'development' ? '/' : '/docs/';
 
 module.exports = {
   title: 'crust{.js}',
   tagline: 'Crust does JavaScript',
   url: 'https://crust.network',
-  baseUrl: BASE_URL,
+  baseUrl: '/',
   onBrokenLinks: 'throw',
   favicon: 'img/favicon.ico',
   organizationName: 'crustio',
