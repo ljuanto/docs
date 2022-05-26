@@ -4,7 +4,7 @@ module.exports = {
   title: 'crust{.js}',
   tagline: 'Crust does JavaScript',
   url: 'https://crust.network',
-  baseUrl: BASE_URL,
+  baseUrl: '/',
   onBrokenLinks: 'throw',
   favicon: 'img/favicon.ico',
   organizationName: 'crustio',
